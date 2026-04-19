@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SocietyPro — Asset Management</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+
+<style>
+/* ===================== CSS VARIABLES & THEMES ===================== */
+:root {
+  --primary: #1a6cf6;
+  --primary-dark: #1355cc;
+  --primary-light: #e8f0fe;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #06b6d4;
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --sidebar-bg: #0f172a;
+  --sidebar-text: #94a3b8;
+  --sidebar-active: #ffffff;
+  --sidebar-active-bg: #1a6cf6;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-main: 'DM Sans', sans-serif;
+  --font-head: 'Space Grotesk', sans-serif;
+  --sidebar-width: 260px;
+  --header-h: 64px;
+  --green-border: #10b981;
+  --yellow-border: #f59e0b;
+  --red-border: #ef4444;
+}
+/* Dark Theme */
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2128;
+  --sidebar-bg: #010409;
+  --sidebar-text: #8b949e;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --border: #30363d;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --primary-light: #1f2937;
+}
+/* Ocean Theme */
+[data-theme="ocean"] {
+  --primary: #0ea5e9;
+  --primary-dark: #0284c7;
+  --primary-light: #e0f2fe;
+  --sidebar-bg: #0c4a6e;
+  --sidebar-active-bg: #0ea5e9;
+  --bg: #f0f9ff;
+}
+/* Forest Theme */
+[data-theme="forest"] {
+  --primary: #059669;
+  --primary-dark: #047857;
+  --primary-light: #d1fae5;
+  --sidebar-bg: #064e3b;
+  --sidebar-active-bg: #059669;
+  --bg: #f0fdf4;
+}
+/* Sunset Theme */
+[data-theme="sunset"] {
+  --primary: #dc2626;
+  --primary-dark: #b91c1c;
+  --primary-light: #fee2e2;
+  --sidebar-bg: #7f1d1d;
+  --sidebar-active-bg: #dc2626;
+  --bg: #fff7ed;
+}
+/* Purple Theme */
+[data-theme="purple"] {
+  --primary: #7c3aed;
+  --primary-dark: #6d28d9;
+  --primary-light: #ede9fe;
+  --sidebar-bg: #1e1b4b;
+  --sidebar-active-bg: #7c3aed;
+  --bg: #f5f3ff;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: var(--font-main); background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+
+/* ===================== AUTH SCREEN ===================== */
+#authScreen {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+  position: relative; overflow: hidden;
+}
+#authScreen::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(26,108,246,0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 30%, rgba(245,158,11,0.08) 0%, transparent 50%);
+}
+.auth-card {
+  background: rgba(255,255,255,0.05); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+  padding: 48px 40px; width: 420px; max-width: 95vw; position: relative; z-index:1;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+.auth-logo { text-align:center; margin-bottom:32px; }
+.auth-logo .logo-icon { width:56px; height:56px; background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%); border-radius:14px; display:inline-flex; align-items:center; justify-content:center; font-size:24px; color:#fff; margin-bottom:12px; }
+.auth-logo h1 { font-family: var(--font-head); font-size:28px; color:#fff; font-weight:700; }
+.auth-logo p { color: #94a3b8; font-size:14px; margin-top:4px; }
+.auth-form label { display:block; color:#cbd5e1; font-size:13px; font-weight:500; margin-bottom:6px; }
+.auth-form input, .auth-form select {
+  width:100%; padding:12px 16px; background: rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+  border-radius:10px; color:#fff; font-size:15px; font-family: var(--font-main);
+  transition: border 0.2s; outline:none; margin-bottom:16px;
+}
+.auth-form input::placeholder { color:#64748b; }
+.auth-form input:focus { border-color: var(--primary); background: rgba(26,108,246,0.08); }
+.auth-form select option { background:#1e2d3d; color:#fff; }
+.btn-auth {
+  width:100%; padding:13px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border:none; border-radius:10px; color:#fff; font-size:16px; font-weight:600;
+  cursor:pointer; font-family: var(--font-main); transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 20px rgba(26,108,246,0.4);
+}
+.btn-auth:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(26,108,246,0.5); }
+.auth-divider { text-align:center; color:#475569; font-size:13px; margin:16px 0; }
+.auth-demo-btns { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px; }
+.btn-demo { padding:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05); border-radius:8px; color:#94a3b8; font-size:11px; cursor:pointer; transition:0.2s; font-family: var(--font-main); }
+.btn-demo:hover { background:rgba(26,108,246,0.2); border-color:var(--primary); color:#fff; }
+
+/* ===================== APP LAYOUT ===================== */
+#app { display:none; min-height:100vh; }
+.layout { display:flex; min-height:100vh; }
+
+/* ===================== SIDEBAR ===================== */
+.sidebar {
+  width: var(--sidebar-width); background: var(--sidebar-bg); position:fixed; left:0; top:0; bottom:0;
+  z-index:200; display:flex; flex-direction:column; transition: width 0.3s, transform 0.3s;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  overflow-y: auto; overflow-x: hidden;
+}
+.sidebar-logo { padding:20px 20px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.06); flex-shrink:0; }
+.sidebar-logo .logo-mark { width:36px; height:36px; background:linear-gradient(135deg, var(--primary), #7c3aed); border-radius:9px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; flex-shrink:0; }
+.sidebar-logo .logo-text { font-family: var(--font-head); color:#fff; font-size:17px; font-weight:700; white-space:nowrap; }
+.sidebar-logo .logo-text span { color: var(--primary); }
+.sidebar-society { padding:12px 16px; background:rgba(255,255,255,0.04); margin:12px 12px 4px; border-radius:10px; }
+.sidebar-society .society-name { color:#e2e8f0; font-size:13px; font-weight:600; }
+.sidebar-society .society-role { color: var(--primary); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+.sidebar-section { padding:8px 12px 4px; color: rgba(148,163,184,0.5); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:8px; }
+.nav-item {
+  display:flex; align-items:center; gap:12px; padding:10px 16px; margin:2px 8px;
+  color: var(--sidebar-text); text-decoration:none; border-radius:9px; cursor:pointer;
+  transition: all 0.2s; font-size:14px; font-weight:500; position:relative;
+}
+.nav-item:hover { background:rgba(255,255,255,0.06); color:#e2e8f0; }
+.nav-item.active { background: var(--sidebar-active-bg); color: var(--sidebar-active); box-shadow: 0 2px 12px rgba(26,108,246,0.3); }
+.nav-item i { width:18px; text-align:center; font-size:15px; flex-shrink:0; }
+.nav-badge { margin-left:auto; background:var(--danger); color:#fff; border-radius:20px; font-size:10px; font-weight:700; padding:1px 7px; }
+.sidebar-footer { margin-top:auto; padding:16px; border-top:1px solid rgba(255,255,255,0.06); }
+.user-avatar-sm { width:32px; height:32px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; flex-shrink:0; }
+.sidebar-user { display:flex; align-items:center; gap:10px; }
+.sidebar-user .u-name { color:#e2e8f0; font-size:13px; font-weight:600; }
+.sidebar-user .u-email { color:#64748b; font-size:11px; }
+.sidebar-user .btn-logout { margin-left:auto; background:none; border:none; color:#64748b; cursor:pointer; font-size:16px; padding:4px; transition:color 0.2s; }
+.sidebar-user .btn-logout:hover { color:#ef4444; }
+
+/* ===================== MAIN CONTENT ===================== */
+.main-wrap { margin-left: var(--sidebar-width); flex:1; display:flex; flex-direction:column; min-height:100vh; transition: margin-left 0.3s; }
+.topbar {
+  height: var(--header-h); background: var(--surface); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:16px; padding:0 24px; position:sticky; top:0; z-index:100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.topbar-title { font-family: var(--font-head); font-size:18px; font-weight:700; color: var(--text); flex:1; }
+.topbar-title span { color: var(--text-muted); font-weight:400; font-size:14px; margin-left:8px; }
+.topbar-actions { display:flex; align-items:center; gap:10px; }
+.btn-icon { width:38px; height:38px; border-radius:9px; border:1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:0.2s; position:relative; }
+.btn-icon:hover { background: var(--primary-light); color: var(--primary); border-color:var(--primary); }
+.notif-dot { position:absolute; top:6px; right:6px; width:8px; height:8px; background:var(--danger); border-radius:50%; border:2px solid var(--surface); }
+.btn-menu { display:none; }
+
+.content { flex:1; padding:24px; }
+
+/* ===================== CARDS & GRIDS ===================== */
+.page { display:none; animation: fadeIn 0.3s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from {opacity:0; transform:translateY(8px);} to {opacity:1; transform:translateY(0);} }
+
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
+.kpi-card {
+  background: var(--surface); border-radius: var(--radius); padding:20px; border:1px solid var(--border);
+  box-shadow: var(--shadow); display:flex; align-items:center; gap:16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.kpi-card:hover { transform:translateY(-2px); box-shadow: var(--shadow-lg); }
+.kpi-icon { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.kpi-icon.green { background:#d1fae5; color:#059669; }
+.kpi-icon.blue { background:#dbeafe; color:#1d4ed8; }
+.kpi-icon.yellow { background:#fef3c7; color:#d97706; }
+.kpi-icon.red { background:#fee2e2; color:#dc2626; }
+.kpi-icon.purple { background:#ede9fe; color:#7c3aed; }
+.kpi-icon.cyan { background:#cffafe; color:#0891b2; }
+.kpi-val { font-family: var(--font-head); font-size:28px; font-weight:700; color: var(--text); line-height:1; }
+.kpi-label { color: var(--text-muted); font-size:13px; margin-top:3px; }
+.kpi-trend { font-size:12px; margin-top:4px; font-weight:500; }
+.kpi-trend.up { color: var(--success); } .kpi-trend.down { color: var(--danger); }
+
+.section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.section-title { font-family: var(--font-head); font-size:17px; font-weight:700; color: var(--text); display:flex; align-items:center; gap:8px; }
+.section-title::before { content:''; width:4px; height:20px; background: var(--primary); border-radius:2px; }
+
+/* ===================== ASSET GRID ===================== */
+.asset-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
+.asset-card {
+  background: var(--surface); border-radius: var(--radius); padding:20px 16px;
+  border:2px solid var(--border); box-shadow: var(--shadow);
+  cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;
+  display:flex; flex-direction:column; gap:10px; position:relative; overflow:hidden;
+}
+.asset-card:hover { transform:translateY(-3px); box-shadow: var(--shadow-lg); }
+.asset-card.working { border-color: var(--green-border); }
+.asset-card.maintenance { border-color: var(--yellow-border); }
+.asset-card.breakdown { border-color: var(--red-border); }
+.asset-card .status-bar { position:absolute; top:0; left:0; right:0; height:4px; }
+.asset-card.working .status-bar { background: var(--green-border); }
+.asset-card.maintenance .status-bar { background: var(--yellow-border); }
+.asset-card.breakdown .status-bar { background: var(--red-border); }
+.asset-icon-wrap { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; }
+.asset-card.working .asset-icon-wrap { background:#d1fae5; }
+.asset-card.maintenance .asset-icon-wrap { background:#fef3c7; }
+.asset-card.breakdown .asset-icon-wrap { background:#fee2e2; }
+.asset-name { font-weight:700; font-size:15px; color: var(--text); }
+.asset-id { font-size:11px; color: var(--text-muted); }
+.asset-status-badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; }
+.asset-status-badge.working { background:#d1fae5; color:#059669; }
+.asset-status-badge.maintenance { background:#fef3c7; color:#d97706; }
+.asset-status-badge.breakdown { background:#fee2e2; color:#dc2626; }
+.asset-status-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; }
+.asset-meta { font-size:12px; color: var(--text-muted); display:flex; align-items:center; gap:5px; }
+
+/* ===================== TABLES ===================== */
+.table-wrap { background: var(--surface); border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow); overflow:hidden; }
+.table-toolbar { padding:16px 20px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; border-bottom:1px solid var(--border); }
+.search-box { flex:1; min-width:200px; display:flex; align-items:center; gap:8px; background: var(--surface2); border:1px solid var(--border); border-radius:9px; padding:8px 14px; }
+.search-box input { border:none; background:none; outline:none; font-size:14px; color: var(--text); font-family: var(--font-main); flex:1; }
+.search-box i { color: var(--text-muted); font-size:14px; }
+table { width:100%; border-collapse:collapse; }
+thead th { padding:11px 16px; font-size:12px; font-weight:600; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background: var(--surface2); border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+tbody tr { border-bottom:1px solid var(--border); transition:background 0.15s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td { padding:12px 16px; font-size:14px; color: var(--text); vertical-align:middle; }
+.table-overflow { overflow-x:auto; }
+
+/* ===================== BADGES ===================== */
+.badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; }
+.badge.green { background:#d1fae5; color:#059669; }
+.badge.yellow { background:#fef3c7; color:#d97706; }
+.badge.red { background:#fee2e2; color:#dc2626; }
+.badge.blue { background:#dbeafe; color:#1d4ed8; }
+.badge.gray { background:#f1f5f9; color:#64748b; }
+.badge.purple { background:#ede9fe; color:#7c3aed; }
+
+/* ===================== BUTTONS ===================== */
+.btn { display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius: var(--radius-sm); border:none; cursor:pointer; font-size:14px; font-weight:600; font-family: var(--font-main); transition: all 0.2s; white-space:nowrap; }
+.btn-primary { background: var(--primary); color:#fff; box-shadow:0 2px 8px rgba(26,108,246,0.3); }
+.btn-primary:hover { background: var(--primary-dark); transform:translateY(-1px); box-shadow:0 4px 16px rgba(26,108,246,0.4); }
+.btn-secondary { background: var(--surface); color: var(--text); border:1px solid var(--border); }
+.btn-secondary:hover { background: var(--surface2); }
+.btn-success { background: var(--success); color:#fff; }
+.btn-success:hover { background:#059669; }
+.btn-danger { background: var(--danger); color:#fff; }
+.btn-danger:hover { background:#dc2626; }
+.btn-warning { background: var(--warning); color:#fff; }
+.btn-sm { padding:6px 12px; font-size:12px; }
+.btn-xs { padding:4px 10px; font-size:11px; }
+
+/* ===================== MODAL ===================== */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000;
+  display:none; align-items:center; justify-content:center; padding:20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display:flex; animation: fadeIn 0.2s; }
+.modal {
+  background: var(--surface); border-radius:16px; width:100%; max-width:580px; max-height:90vh;
+  overflow-y:auto; box-shadow: 0 24px 64px rgba(0,0,0,0.25); border:1px solid var(--border);
+}
+.modal-header { padding:20px 24px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.modal-title { font-family: var(--font-head); font-size:18px; font-weight:700; color: var(--text); }
+.modal-close { background:none; border:none; color: var(--text-muted); cursor:pointer; font-size:20px; padding:4px; border-radius:6px; transition:0.2s; }
+.modal-close:hover { background: var(--surface2); color: var(--danger); }
+.modal-body { padding:24px; }
+.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+
+/* ===================== FORMS ===================== */
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-size:13px; font-weight:600; color: var(--text); margin-bottom:6px; }
+.form-group input, .form-group select, .form-group textarea {
+  width:100%; padding:10px 14px; background: var(--surface2); border:1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size:14px; font-family: var(--font-main);
+  transition: border 0.2s; outline:none;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--primary); background: var(--primary-light);
+}
+.form-group textarea { resize:vertical; min-height:80px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+/* ===================== CHARTS ===================== */
+.chart-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:16px; margin-bottom:24px; }
+.chart-card { background: var(--surface); border-radius: var(--radius); padding:20px; border:1px solid var(--border); box-shadow: var(--shadow); }
+.chart-title { font-family: var(--font-head); font-size:15px; font-weight:700; color: var(--text); margin-bottom:16px; }
+.chart-container { position:relative; height:220px; }
+
+/* ===================== CALENDAR ===================== */
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-header { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:4px; }
+.cal-day-name { text-align:center; font-size:11px; font-weight:600; color: var(--text-muted); padding:6px 0; text-transform:uppercase; }
+.cal-day { min-height:80px; background: var(--surface2); border-radius:8px; padding:6px; border:1px solid var(--border); transition:0.2s; }
+.cal-day:hover { border-color: var(--primary); }
+.cal-day.today { border-color: var(--primary); background: var(--primary-light); }
+.cal-day.other-month { opacity:0.4; }
+.cal-date { font-size:13px; font-weight:600; color: var(--text); margin-bottom:4px; }
+.cal-event { font-size:10px; padding:2px 6px; border-radius:4px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cal-event.blue { background:#dbeafe; color:#1d4ed8; }
+.cal-event.yellow { background:#fef3c7; color:#d97706; }
+.cal-event.red { background:#fee2e2; color:#dc2626; }
+.cal-event.green { background:#d1fae5; color:#059669; }
+.cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.cal-title { font-family: var(--font-head); font-size:18px; font-weight:700; }
+
+/* ===================== ATTENDANCE ===================== */
+.attendance-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:16px; }
+.staff-card { background: var(--surface); border-radius: var(--radius); padding:16px; border:1px solid var(--border); box-shadow: var(--shadow); }
+.staff-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.staff-avatar { width:44px; height:44px; border-radius:50%; background: var(--primary-light); display:flex; align-items:center; justify-content:center; color: var(--primary); font-size:18px; flex-shrink:0; }
+.staff-name { font-weight:700; font-size:15px; color: var(--text); }
+.staff-role { font-size:12px; color: var(--text-muted); }
+.att-toggle { display:flex; gap:8px; }
+.att-btn { flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background: var(--surface2); color: var(--text-muted); font-size:12px; font-weight:600; cursor:pointer; transition:0.2s; text-align:center; }
+.att-btn.present { background:#d1fae5; color:#059669; border-color:#059669; }
+.att-btn.absent { background:#fee2e2; color:#dc2626; border-color:#dc2626; }
+.att-btn.half { background:#fef3c7; color:#d97706; border-color:#d97706; }
+.att-btn:hover { opacity:0.85; }
+
+/* ===================== NOTIFICATION PANEL ===================== */
+.notif-panel {
+  position:fixed; right:0; top:0; bottom:0; width:340px; background: var(--surface);
+  border-left:1px solid var(--border); z-index:300; transform:translateX(100%);
+  transition: transform 0.3s; box-shadow: -8px 0 32px rgba(0,0,0,0.1); overflow-y:auto;
+}
+.notif-panel.open { transform:translateX(0); }
+.notif-panel-header { padding:20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.notif-item { padding:16px 20px; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.15s; }
+.notif-item:hover { background: var(--surface2); }
+.notif-item.unread { border-left:3px solid var(--primary); }
+.notif-item-title { font-weight:600; font-size:14px; color: var(--text); margin-bottom:4px; }
+.notif-item-desc { font-size:13px; color: var(--text-muted); }
+.notif-item-time { font-size:11px; color: var(--text-muted); margin-top:4px; }
+
+/* ===================== SETTINGS ===================== */
+.settings-section { background: var(--surface); border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow); margin-bottom:20px; overflow:hidden; }
+.settings-section-header { padding:16px 20px; border-bottom:1px solid var(--border); background: var(--surface2); }
+.settings-section-title { font-family: var(--font-head); font-size:15px; font-weight:700; color: var(--text); }
+.settings-row { padding:14px 20px; display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--border); }
+.settings-row:last-child { border-bottom:none; }
+.settings-row-label { flex:1; }
+.settings-row-label strong { display:block; font-size:14px; color: var(--text); font-weight:600; }
+.settings-row-label small { color: var(--text-muted); font-size:12px; }
+.toggle-switch { position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0; }
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; cursor:pointer; inset:0; background:#cbd5e1; border-radius:12px; transition:.3s; }
+.toggle-slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.3s; }
+input:checked + .toggle-slider { background: var(--primary); }
+input:checked + .toggle-slider:before { transform:translateX(20px); }
+
+/* ===================== THEME SWITCHER ===================== */
+.theme-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(90px,1fr)); gap:12px; }
+.theme-opt { border:2px solid var(--border); border-radius:12px; padding:12px; cursor:pointer; text-align:center; transition:0.2s; }
+.theme-opt:hover { border-color: var(--primary); }
+.theme-opt.active { border-color: var(--primary); background: var(--primary-light); }
+.theme-swatch { width:40px; height:40px; border-radius:10px; margin:0 auto 8px; }
+.theme-opt-name { font-size:12px; font-weight:600; color: var(--text); }
+
+/* ===================== PROGRESS ===================== */
+.progress-bar { background: var(--border); border-radius:4px; height:6px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:4px; transition: width 0.5s ease; }
+.progress-fill.green { background: var(--success); }
+.progress-fill.yellow { background: var(--warning); }
+.progress-fill.red { background: var(--danger); }
+.progress-fill.blue { background: var(--primary); }
+
+/* ===================== ALERTS/TOAST ===================== */
+#toastContainer { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+.toast { padding:14px 18px; border-radius:12px; background: var(--surface); border:1px solid var(--border); box-shadow: var(--shadow-lg); display:flex; align-items:center; gap:12px; max-width:340px; animation: slideIn 0.3s ease; font-size:14px; font-weight:500; }
+.toast.success { border-color: var(--success); background:#f0fdf4; color:#065f46; }
+.toast.error { border-color: var(--danger); background:#fef2f2; color:#7f1d1d; }
+.toast.warning { border-color: var(--warning); background:#fffbeb; color:#78350f; }
+.toast.info { border-color: var(--info); background:#ecfeff; color:#164e63; }
+@keyframes slideIn { from{transform:translateX(100%);opacity:0;} to{transform:translateX(0);opacity:1;} }
+.toast i { font-size:18px; }
+
+/* ===================== EMPTY STATE ===================== */
+.empty-state { text-align:center; padding:60px 20px; }
+.empty-state i { font-size:48px; color: var(--border); margin-bottom:16px; display:block; }
+.empty-state h3 { font-family: var(--font-head); font-size:18px; color: var(--text-muted); margin-bottom:8px; }
+.empty-state p { color: var(--text-muted); font-size:14px; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .sidebar { transform:translateX(-100%); }
+  .sidebar.open { transform:translateX(0); }
+  .main-wrap { margin-left:0; }
+  .btn-menu { display:flex; }
+  .kpi-grid { grid-template-columns:1fr 1fr; }
+  .form-row { grid-template-columns:1fr; }
+  .chart-grid { grid-template-columns:1fr; }
+  .asset-grid { grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); }
+  .content { padding:16px; }
+  .modal { max-width:100%; }
+  .auth-demo-btns { grid-template-columns:1fr; }
+}
+@media (max-width: 480px) {
+  .kpi-grid { grid-template-columns:1fr; }
+  .topbar { padding:0 14px; }
+  .topbar-title { font-size:15px; }
+  .content { padding:12px; }
+}
+
+/* Overlay for mobile sidebar */
+#sidebarOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:199; display:none; }
+#sidebarOverlay.open { display:block; }
+
+/* AMC Expiry alert row */
+.expiry-soon { background:#fffbeb !important; }
+.expiry-critical { background:#fef2f2 !important; }
+
+/* Approval card */
+.approval-card { background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding:20px; margin-bottom:16px; box-shadow: var(--shadow); }
+.approval-title { font-family: var(--font-head); font-size:16px; font-weight:700; margin-bottom:8px; }
+.approval-meta { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; }
+.approval-meta span { font-size:13px; color: var(--text-muted); display:flex; align-items:center; gap:4px; }
+.approval-actions { display:flex; gap:10px; margin-top:14px; }
+
+/* Report card */
+.report-card { background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding:20px; box-shadow: var(--shadow); }
+
+/* Tabs */
+.tab-nav { display:flex; gap:4px; background: var(--surface2); border:1px solid var(--border); border-radius:10px; padding:4px; margin-bottom:20px; flex-wrap:wrap; }
+.tab-btn { flex:1; min-width:80px; padding:8px 16px; border-radius:8px; border:none; background:none; color: var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; transition:0.2s; font-family: var(--font-main); text-align:center; }
+.tab-btn.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow); }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+</style>
+</head>
+<body>
+
+<!-- ==================== AUTH SCREEN ==================== -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon"><i class="fas fa-building"></i></div>
+      <h1>SocietyPro</h1>
+      <p>Asset Management Platform</p>
+    </div>
+    <div class="auth-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••">
+      </div>
+      <button class="btn-auth" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+      <div class="auth-divider">— or quick demo login —</div>
+      <div class="auth-demo-btns">
+        <button class="btn-demo" onclick="demoLogin('admin')"><i class="fas fa-crown"></i> Admin</button>
+        <button class="btn-demo" onclick="demoLogin('manager')"><i class="fas fa-hard-hat"></i> Manager</button>
+        <button class="btn-demo" onclick="demoLogin('committee')"><i class="fas fa-users"></i> Committee</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="app">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark"><i class="fas fa-building"></i></div>
+        <div class="logo-text">Society<span>Pro</span></div>
+      </div>
+      <div class="sidebar-society">
+        <div class="society-name" id="sidebarSociety">Green Valley CHS</div>
+        <div class="society-role" id="sidebarRole">Admin</div>
+      </div>
+
+      <div class="sidebar-section">Main</div>
+      <a class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <i class="fas fa-th-large"></i> Dashboard
+      </a>
+      <a class="nav-item" onclick="showPage('assets')" id="nav-assets">
+        <i class="fas fa-cubes"></i> Assets
+      </a>
+      <a class="nav-item" onclick="showPage('complaints')" id="nav-complaints">
+        <i class="fas fa-exclamation-circle"></i> Complaints
+        <span class="nav-badge" id="complaintBadge">3</span>
+      </a>
+      <a class="nav-item" onclick="showPage('amc')" id="nav-amc">
+        <i class="fas fa-file-contract"></i> AMC
+      </a>
+      <a class="nav-item" onclick="showPage('approvals')" id="nav-approvals">
+        <i class="fas fa-check-double"></i> Approvals
+        <span class="nav-badge" id="approvalBadge">2</span>
+      </a>
+      <a class="nav-item" onclick="showPage('calendar')" id="nav-calendar">
+        <i class="fas fa-calendar-alt"></i> Calendar
+      </a>
+      <a class="nav-item" onclick="showPage('tasks')" id="nav-tasks">
+        <i class="fas fa-tasks"></i> Projected Tasks
+      </a>
+
+      <div class="sidebar-section">Operations</div>
+      <a class="nav-item" onclick="showPage('attendance')" id="nav-attendance">
+        <i class="fas fa-user-clock"></i> Staff Attendance
+      </a>
+      <a class="nav-item" onclick="showPage('oncall')" id="nav-oncall">
+        <i class="fas fa-phone-alt"></i> On-Call Services
+      </a>
+      <a class="nav-item" onclick="showPage('reports')" id="nav-reports">
+        <i class="fas fa-chart-bar"></i> Reports
+      </a>
+
+      <div class="sidebar-section admin-only">Admin</div>
+      <a class="nav-item admin-only" onclick="showPage('users')" id="nav-users">
+        <i class="fas fa-users-cog"></i> Users
+      </a>
+      <a class="nav-item admin-only" onclick="showPage('settings')" id="nav-settings">
+        <i class="fas fa-cog"></i> Settings
+      </a>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar-sm" id="sidebarAvatar">A</div>
+          <div>
+            <div class="u-name" id="sidebarName">Admin User</div>
+            <div class="u-email" id="sidebarEmail">admin@society.com</div>
+          </div>
+          <button class="btn-logout" onclick="doLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MOBILE OVERLAY -->
+    <div id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN -->
+    <div class="main-wrap">
+      <div class="topbar">
+        <button class="btn-icon btn-menu" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="topbar-title" id="topbarTitle">Dashboard <span id="topbarSub">Overview</span></div>
+        <div class="topbar-actions">
+          <button class="btn-icon" onclick="toggleNotifPanel()" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <div class="notif-dot"></div>
+          </button>
+          <button class="btn-icon" title="Toggle Theme" onclick="showPage('settings')">
+            <i class="fas fa-palette"></i>
+          </button>
+          <div class="user-avatar-sm" id="topbarAvatar" style="cursor:pointer" onclick="showPage('settings')">A</div>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- ===== DASHBOARD ===== -->
+        <div class="page active" id="page-dashboard">
+          <div class="kpi-grid" id="kpiGrid">
+            <div class="kpi-card">
+              <div class="kpi-icon green"><i class="fas fa-check-circle"></i></div>
+              <div><div class="kpi-val" id="kpi-working">0</div><div class="kpi-label">Working Assets</div><div class="kpi-trend up">↑ All operational</div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon yellow"><i class="fas fa-tools"></i></div>
+              <div><div class="kpi-val" id="kpi-maint">0</div><div class="kpi-label">Under Maintenance</div><div class="kpi-trend">Scheduled</div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+              <div><div class="kpi-val" id="kpi-breakdown">0</div><div class="kpi-label">Breakdown</div><div class="kpi-trend down">↓ Need attention</div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon blue"><i class="fas fa-clipboard-list"></i></div>
+              <div><div class="kpi-val" id="kpi-complaints">0</div><div class="kpi-label">Open Complaints</div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon purple"><i class="fas fa-file-contract"></i></div>
+              <div><div class="kpi-val" id="kpi-amc">0</div><div class="kpi-label">Active AMCs</div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon cyan"><i class="fas fa-user-clock"></i></div>
+              <div><div class="kpi-val" id="kpi-staff">0</div><div class="kpi-label">Staff Present Today</div></div>
+            </div>
+          </div>
+
+          <div class="chart-grid">
+            <div class="chart-card">
+              <div class="chart-title">Asset Status Distribution</div>
+              <div class="chart-container"><canvas id="assetPieChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Complaints by Category</div>
+              <div class="chart-container"><canvas id="complaintBarChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Monthly Maintenance Trend</div>
+              <div class="chart-container"><canvas id="maintLineChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Staff Attendance (This Week)</div>
+              <div class="chart-container"><canvas id="attendanceChart"></canvas></div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap;">
+            <div class="table-wrap">
+              <div class="table-toolbar"><span class="section-title">Recent Complaints</span></div>
+              <div class="table-overflow"><table>
+                <thead><tr><th>Asset</th><th>Issue</th><th>Priority</th><th>Status</th></tr></thead>
+                <tbody id="dashComplaintsTable"></tbody>
+              </table></div>
+            </div>
+            <div class="table-wrap">
+              <div class="table-toolbar"><span class="section-title">AMC Expiry Alerts</span></div>
+              <div class="table-overflow"><table>
+                <thead><tr><th>Asset</th><th>Vendor</th><th>Expiry</th><th>Status</th></tr></thead>
+                <tbody id="dashAmcTable"></tbody>
+              </table></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ASSETS ===== -->
+        <div class="page" id="page-assets">
+          <div class="section-header">
+            <div class="section-title">Asset Registry</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <select id="assetStatusFilter" onchange="renderAssets()" class="form-group" style="width:auto;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-main)">
+                <option value="">All Status</option>
+                <option value="working">Working</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="breakdown">Breakdown</option>
+              </select>
+              <button class="btn btn-primary manager-only admin-only" onclick="openAddAsset()"><i class="fas fa-plus"></i> Add Asset</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+            <span class="badge green"><i class="fas fa-circle"></i> Working</span>
+            <span class="badge yellow"><i class="fas fa-circle"></i> Maintenance</span>
+            <span class="badge red"><i class="fas fa-circle"></i> Breakdown</span>
+          </div>
+          <div class="table-toolbar" style="margin-bottom:12px"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="assetSearch" placeholder="Search assets..." oninput="renderAssets()"></div></div>
+          <div class="asset-grid" id="assetGrid"></div>
+        </div>
+
+        <!-- ===== COMPLAINTS ===== -->
+        <div class="page" id="page-complaints">
+          <div class="section-header">
+            <div class="section-title">Complaints Management</div>
+            <button class="btn btn-primary manager-only admin-only" onclick="openAddComplaint()"><i class="fas fa-plus"></i> Log Complaint</button>
+          </div>
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchComplaintTab('open',this)">Open</button>
+            <button class="tab-btn" onclick="switchComplaintTab('inprogress',this)">In Progress</button>
+            <button class="tab-btn" onclick="switchComplaintTab('resolved',this)">Resolved</button>
+            <button class="tab-btn" onclick="switchComplaintTab('all',this)">All</button>
+          </div>
+          <div class="table-wrap">
+            <div class="table-toolbar">
+              <div class="search-box"><i class="fas fa-search"></i><input type="text" id="complaintSearch" placeholder="Search complaints..." oninput="filterComplaints(this.value)"></div>
+            </div>
+            <div class="table-overflow"><table>
+              <thead><tr><th>#</th><th>Asset</th><th>Issue</th><th>Priority</th><th>Logged By</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="complaintsTable"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <!-- ===== AMC ===== -->
+        <div class="page" id="page-amc">
+          <div class="section-header">
+            <div class="section-title">Annual Maintenance Contracts</div>
+            <button class="btn btn-primary manager-only admin-only" onclick="openAddAMC()"><i class="fas fa-plus"></i> Add AMC</button>
+          </div>
+          <div class="kpi-grid" style="margin-bottom:16px">
+            <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-check"></i></div><div><div class="kpi-val" id="amcActive">0</div><div class="kpi-label">Active</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon yellow"><i class="fas fa-clock"></i></div><div><div class="kpi-val" id="amcExpiring">0</div><div class="kpi-label">Expiring (30d)</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-times"></i></div><div><div class="kpi-val" id="amcExpired">0</div><div class="kpi-label">Expired</div></div></div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-toolbar"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="amcSearch" placeholder="Search AMC..." oninput="filterAMC(this.value)"></div></div>
+            <div class="table-overflow"><table>
+              <thead><tr><th>Asset</th><th>Vendor</th><th>Contact</th><th>Start</th><th>Expiry</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="amcTable"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <!-- ===== APPROVALS ===== -->
+        <div class="page" id="page-approvals">
+          <div class="section-header">
+            <div class="section-title">Approvals & Requests</div>
+            <button class="btn btn-primary manager-only admin-only" onclick="openAddApproval()"><i class="fas fa-plus"></i> New Request</button>
+          </div>
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchApprovalTab('pending',this)">Pending</button>
+            <button class="tab-btn" onclick="switchApprovalTab('approved',this)">Approved</button>
+            <button class="tab-btn" onclick="switchApprovalTab('rejected',this)">Rejected</button>
+          </div>
+          <div id="approvalsContainer"></div>
+        </div>
+
+        <!-- ===== CALENDAR ===== -->
+        <div class="page" id="page-calendar">
+          <div class="cal-nav">
+            <button class="btn btn-secondary btn-sm" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+            <div class="cal-title" id="calTitle"></div>
+            <button class="btn btn-secondary btn-sm" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="cal-header">
+            <div class="cal-day-name">Sun</div><div class="cal-day-name">Mon</div><div class="cal-day-name">Tue</div>
+            <div class="cal-day-name">Wed</div><div class="cal-day-name">Thu</div><div class="cal-day-name">Fri</div>
+            <div class="cal-day-name">Sat</div>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+
+        <!-- ===== TASKS ===== -->
+        <div class="page" id="page-tasks">
+          <div class="section-header">
+            <div class="section-title">Projected Tasks</div>
+            <button class="btn btn-primary manager-only admin-only" onclick="openAddTask()"><i class="fas fa-plus"></i> Add Task</button>
+          </div>
+          <div class="table-wrap">
+            <div class="table-overflow"><table>
+              <thead><tr><th>Task</th><th>Asset</th><th>Assigned To</th><th>Due Date</th><th>Priority</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="tasksTable"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <!-- ===== ATTENDANCE ===== -->
+        <div class="page" id="page-attendance">
+          <div class="section-header">
+            <div class="section-title">Staff Attendance Register</div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <input type="date" id="attDate" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-main)" onchange="renderAttendance(this.value)">
+              <button class="btn btn-primary btn-sm" onclick="saveAttendance()"><i class="fas fa-save"></i> Save</button>
+              <button class="btn btn-secondary btn-sm" onclick="exportAttendance()"><i class="fas fa-download"></i> Export</button>
+            </div>
+          </div>
+          <div class="kpi-grid" style="margin-bottom:16px">
+            <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-user-check"></i></div><div><div class="kpi-val" id="attPresent">0</div><div class="kpi-label">Present</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-user-times"></i></div><div><div class="kpi-val" id="attAbsent">0</div><div class="kpi-label">Absent</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon yellow"><i class="fas fa-user-minus"></i></div><div><div class="kpi-val" id="attHalf">0</div><div class="kpi-label">Half Day</div></div></div>
+          </div>
+          <div class="attendance-grid" id="attendanceGrid"></div>
+        </div>
+
+        <!-- ===== ON-CALL SERVICES ===== -->
+        <div class="page" id="page-oncall">
+          <div class="section-header">
+            <div class="section-title">On-Call & Periodical Services</div>
+            <button class="btn btn-primary manager-only admin-only" onclick="openAddOnCall()"><i class="fas fa-plus"></i> Add Service</button>
+          </div>
+          <div class="table-wrap">
+            <div class="table-overflow"><table>
+              <thead><tr><th>Service</th><th>Vendor</th><th>Contact</th><th>Last Done</th><th>Next Due</th><th>Frequency</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="oncallTable"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <!-- ===== REPORTS ===== -->
+        <div class="page" id="page-reports">
+          <div class="section-header">
+            <div class="section-title">Reports & Analytics</div>
+            <button class="btn btn-primary" onclick="generateReport()"><i class="fas fa-file-pdf"></i> Generate Report</button>
+          </div>
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchReportTab('monthly',this)">Monthly Report</button>
+            <button class="tab-btn" onclick="switchReportTab('performance',this)">Performance</button>
+            <button class="tab-btn" onclick="switchReportTab('nextplan',this)">Next Month Plan</button>
+          </div>
+          <div class="tab-content active" id="report-monthly">
+            <div class="chart-grid">
+              <div class="chart-card"><div class="chart-title">Monthly Complaints Trend</div><div class="chart-container"><canvas id="rptComplaintsChart"></canvas></div></div>
+              <div class="chart-card"><div class="chart-title">Budget vs Actual Expenses</div><div class="chart-container"><canvas id="rptBudgetChart"></canvas></div></div>
+            </div>
+          </div>
+          <div class="tab-content" id="report-performance">
+            <div class="chart-grid">
+              <div class="chart-card"><div class="chart-title">Response Time (Avg Hours)</div><div class="chart-container"><canvas id="rptResponseChart"></canvas></div></div>
+              <div class="chart-card"><div class="chart-title">Resolution Rate (%)</div><div class="chart-container"><canvas id="rptResolutionChart"></canvas></div></div>
+            </div>
+          </div>
+          <div class="tab-content" id="report-nextplan">
+            <div class="report-card">
+              <div class="section-title" style="margin-bottom:16px">Next Month Planned Activities</div>
+              <div id="nextPlanContainer"></div>
+              <button class="btn btn-primary btn-sm manager-only admin-only" style="margin-top:16px" onclick="openAddPlan()"><i class="fas fa-plus"></i> Add Plan Item</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== USERS ===== -->
+        <div class="page" id="page-users">
+          <div class="section-header">
+            <div class="section-title">User Management</div>
+            <button class="btn btn-primary" onclick="openAddUser()"><i class="fas fa-plus"></i> Add User</button>
+          </div>
+          <div class="table-wrap">
+            <div class="table-overflow"><table>
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Action</th></tr></thead>
+              <tbody id="usersTable"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <!-- ===== SETTINGS ===== -->
+        <div class="page" id="page-settings">
+          <!-- Theme -->
+          <div class="settings-section">
+            <div class="settings-section-header"><div class="settings-section-title"><i class="fas fa-palette"></i> Theme & Appearance</div></div>
+            <div style="padding:20px">
+              <div class="theme-grid" id="themeGrid">
+                <div class="theme-opt active" onclick="applyTheme('default',this)">
+                  <div class="theme-swatch" style="background:linear-gradient(135deg,#0f172a,#1a6cf6)"></div>
+                  <div class="theme-opt-name">Default</div>
+                </div>
+                <div class="theme-opt" onclick="applyTheme('dark',this)">
+                  <div class="theme-swatch" style="background:linear-gradient(135deg,#0d1117,#1a6cf6)"></div>
+                  <div class="theme-opt-name">Dark</div>
+                </div>
+                <div class="theme-opt" onclick="applyTheme('ocean',this)">
+                  <div class="theme-swatch" style="background:linear-gradient(135deg,#0c4a6e,#0ea5e9)"></div>
+                  <div class="theme-opt-name">Ocean</div>
+                </div>
+                <div class="theme-opt" onclick="applyTheme('forest',this)">
+                  <div class="theme-swatch" style="background:linear-gradient(135deg,#064e3b,#059669)"></div>
+                  <div class="theme-opt-name">Forest</div>
+                </div>
+                <div class="theme-opt" onclick="applyTheme('sunset',this)">
+                  <div class="theme-swatch" style="background:linear-gradient(135deg,#7f1d1d,#dc2626)"></div>
+                  <div class="theme-opt-name">Sunset</div>
+                </div>
+                <div class="theme-opt" onclick="applyTheme('purple',this)">
+                  <div class="theme-swatch" style="background:linear-gradient(135deg,#1e1b4b,#7c3aed)"></div>
+                  <div class="theme-opt-name">Royal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Society Info -->
+          <div class="settings-section">
+            <div class="settings-section-header"><div class="settings-section-title"><i class="fas fa-building"></i> Society Information</div></div>
+            <div style="padding:20px">
+              <div class="form-row">
+                <div class="form-group"><label>Society Name</label><input type="text" id="set-societyName" value="Green Valley CHS"></div>
+                <div class="form-group"><label>City</label><input type="text" id="set-city" value="Mumbai"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Total Units</label><input type="number" id="set-units" value="120"></div>
+                <div class="form-group"><label>Contact Email</label><input type="email" id="set-email" value="admin@greenvalley.com"></div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="saveSocietySettings()"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+          </div>
+
+          <!-- EmailJS Settings -->
+          <div class="settings-section">
+            <div class="settings-section-header"><div class="settings-section-title"><i class="fas fa-envelope"></i> Email Notifications (EmailJS)</div></div>
+            <div style="padding:20px">
+              <div class="form-row">
+                <div class="form-group"><label>EmailJS Service ID</label><input type="text" id="ejsServiceId" placeholder="service_xxxxxxx"></div>
+                <div class="form-group"><label>EmailJS Template ID</label><input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx"></div>
+              </div>
+              <div class="form-group"><label>EmailJS Public Key</label><input type="text" id="ejsPublicKey" placeholder="xxxxxxxxxxxxxxxx"></div>
+              <button class="btn btn-primary btn-sm" onclick="saveEmailSettings()"><i class="fas fa-save"></i> Save Email Settings</button>
+            </div>
+            <div id="emailEventsList">
+              <div class="settings-row">
+                <div class="settings-row-label"><strong>Breakdown Alert</strong><small>Send email when asset breakdown logged</small></div>
+                <div class="form-group" style="flex:1;margin:0"><input type="text" placeholder="email1@x.com, email2@x.com" id="email-breakdown" style="margin:0"></div>
+                <label class="toggle-switch"><input type="checkbox" id="tog-breakdown" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-label"><strong>AMC Expiry Reminder</strong><small>Send 30 days before AMC expiry</small></div>
+                <div class="form-group" style="flex:1;margin:0"><input type="text" placeholder="email1@x.com, email2@x.com" id="email-amc" style="margin:0"></div>
+                <label class="toggle-switch"><input type="checkbox" id="tog-amc" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-label"><strong>Complaint Logged</strong><small>Notify when new complaint is filed</small></div>
+                <div class="form-group" style="flex:1;margin:0"><input type="text" placeholder="email1@x.com, email2@x.com" id="email-complaint" style="margin:0"></div>
+                <label class="toggle-switch"><input type="checkbox" id="tog-complaint"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-label"><strong>Approval Request</strong><small>Notify committee on new approval</small></div>
+                <div class="form-group" style="flex:1;margin:0"><input type="text" placeholder="email1@x.com, email2@x.com" id="email-approval" style="margin:0"></div>
+                <label class="toggle-switch"><input type="checkbox" id="tog-approval" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-label"><strong>Task Overdue</strong><small>Notify when task passes due date</small></div>
+                <div class="form-group" style="flex:1;margin:0"><input type="text" placeholder="email1@x.com, email2@x.com" id="email-overdue" style="margin:0"></div>
+                <label class="toggle-switch"><input type="checkbox" id="tog-overdue" checked><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main-wrap -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- ==================== NOTIFICATION PANEL ==================== -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <span style="font-family:var(--font-head);font-weight:700;font-size:16px">Notifications</span>
+    <button class="modal-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+  </div>
+  <div id="notifList"></div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Add Asset Modal -->
+<div class="modal-overlay" id="addAssetModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add New Asset</div><button class="modal-close" onclick="closeModal('addAssetModal')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editAssetId">
+      <div class="form-row">
+        <div class="form-group"><label>Asset Name *</label><select id="assetType">
+          <option>Lift</option><option>STP</option><option>WTP</option><option>CCTV System</option>
+          <option>Swimming Pool</option><option>OWC</option><option>Solar System</option>
+          <option>Fire System</option><option>Water Pump</option><option>Boom Barrier</option>
+          <option>HVAC</option><option>BMS</option><option>Fountain / Water Body</option>
+          <option>Gym Equipment</option><option>Children Play Equipment</option>
+          <option>AC Unit</option><option>Access Control</option><option>Irrigation System</option>
+          <option>Generator</option><option>Other</option>
+        </select></div>
+        <div class="form-group"><label>Asset ID / Tag *</label><input type="text" id="assetTagId" placeholder="e.g. LIFT-01"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Location</label><input type="text" id="assetLocation" placeholder="e.g. Tower A, Basement"></div>
+        <div class="form-group"><label>Brand / Model</label><input type="text" id="assetBrand" placeholder="e.g. Otis, Kirloskar"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Installation Date</label><input type="date" id="assetInstallDate"></div>
+        <div class="form-group"><label>Warranty Expiry</label><input type="date" id="assetWarranty"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Status</label>
+          <select id="assetStatus"><option value="working">Working</option><option value="maintenance">Maintenance</option><option value="breakdown">Breakdown</option></select>
+        </div>
+        <div class="form-group"><label>Purchase Value (₹)</label><input type="number" id="assetValue" placeholder="0"></div>
+      </div>
+      <div class="form-group"><label>Notes</label><textarea id="assetNotes" placeholder="Any additional notes..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addAssetModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAsset()"><i class="fas fa-save"></i> Save Asset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Complaint Modal -->
+<div class="modal-overlay" id="addComplaintModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Log Complaint</div><button class="modal-close" onclick="closeModal('addComplaintModal')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editComplaintId">
+      <div class="form-row">
+        <div class="form-group"><label>Asset *</label><select id="cmpAsset"></select></div>
+        <div class="form-group"><label>Priority</label>
+          <select id="cmpPriority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="critical">Critical</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Issue Description *</label><textarea id="cmpDesc" placeholder="Describe the issue..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Complaint Type</label>
+          <select id="cmpType"><option>Breakdown</option><option>Routine Maintenance</option><option>Noise Issue</option><option>Safety Concern</option><option>Other</option></select>
+        </div>
+        <div class="form-group"><label>Reported By</label><input type="text" id="cmpBy" placeholder="Name / Unit No."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addComplaintModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveComplaint()"><i class="fas fa-save"></i> Log Complaint</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add AMC Modal -->
+<div class="modal-overlay" id="addAmcModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add AMC</div><button class="modal-close" onclick="closeModal('addAmcModal')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editAmcId">
+      <div class="form-row">
+        <div class="form-group"><label>Asset *</label><select id="amcAsset"></select></div>
+        <div class="form-group"><label>Vendor Name *</label><input type="text" id="amcVendor" placeholder="e.g. ABC Services Pvt Ltd"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Contact Number</label><input type="tel" id="amcContact" placeholder="9876543210"></div>
+        <div class="form-group"><label>Amount (₹)</label><input type="number" id="amcAmount" placeholder="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Start Date *</label><input type="date" id="amcStart"></div>
+        <div class="form-group"><label>Expiry Date *</label><input type="date" id="amcExpiry"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>AMC Type</label>
+          <select id="amcType"><option>Comprehensive</option><option>Non-Comprehensive</option><option>Labour Only</option></select>
+        </div>
+        <div class="form-group"><label>Visit Frequency</label>
+          <select id="amcFreq"><option>Monthly</option><option>Quarterly</option><option>Half-Yearly</option><option>Annual</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Notes</label><textarea id="amcNotes" placeholder="Scope of work, inclusions..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addAmcModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAMC()"><i class="fas fa-save"></i> Save AMC</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Approval Modal -->
+<div class="modal-overlay" id="addApprovalModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">New Approval Request</div><button class="modal-close" onclick="closeModal('addApprovalModal')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Request Type</label>
+          <select id="aprType"><option>AMC Renewal Quotation</option><option>Maintenance Budget</option><option>Repair Quotation</option><option>New Purchase</option><option>Contractor Approval</option></select>
+        </div>
+        <div class="form-group"><label>Asset</label><select id="aprAsset"></select></div>
+      </div>
+      <div class="form-group"><label>Description *</label><textarea id="aprDesc" placeholder="Describe the request and justification..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Amount (₹)</label><input type="number" id="aprAmount" placeholder="0"></div>
+        <div class="form-group"><label>Urgency</label>
+          <select id="aprUrgency"><option value="normal">Normal</option><option value="urgent">Urgent</option><option value="critical">Critical</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Vendor / Contractor</label><input type="text" id="aprVendor" placeholder="Vendor name"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addApprovalModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveApproval()"><i class="fas fa-save"></i> Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal-overlay" id="addTaskModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add Projected Task</div><button class="modal-close" onclick="closeModal('addTaskModal')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Task Description *</label><input type="text" id="taskDesc" placeholder="e.g. Monthly fire system inspection"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Asset</label><select id="taskAsset"></select></div>
+        <div class="form-group"><label>Assigned To</label><input type="text" id="taskAssigned" placeholder="Staff name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Due Date *</label><input type="date" id="taskDue"></div>
+        <div class="form-group"><label>Priority</label>
+          <select id="taskPriority"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addTaskModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()"><i class="fas fa-save"></i> Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add On-Call Service Modal -->
+<div class="modal-overlay" id="addOnCallModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add On-Call / Periodical Service</div><button class="modal-close" onclick="closeModal('addOnCallModal')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Service Type *</label>
+          <select id="ocService">
+            <option>Pest Control</option><option>Tank Cleaning</option><option>Water Pump Service</option>
+            <option>Electrical Inspection</option><option>Fire Audit</option><option>Lift Servicing</option>
+            <option>AC Servicing</option><option>Pool Cleaning</option><option>Garden Maintenance</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Vendor</label><input type="text" id="ocVendor" placeholder="Vendor name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Contact</label><input type="tel" id="ocContact" placeholder="9876543210"></div>
+        <div class="form-group"><label>Frequency</label>
+          <select id="ocFreq"><option>Weekly</option><option>Monthly</option><option>Quarterly</option><option>Half-Yearly</option><option>Annual</option><option>On-Call</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Last Service Date</label><input type="date" id="ocLast"></div>
+        <div class="form-group"><label>Next Due Date</label><input type="date" id="ocNext"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addOnCallModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveOnCall()"><i class="fas fa-save"></i> Save Service</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add User</div><button class="modal-close" onclick="closeModal('addUserModal')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" id="newUserName" placeholder="Full name"></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="newUserEmail" placeholder="email@society.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Password *</label><input type="password" id="newUserPass" placeholder="Min 6 chars"></div>
+        <div class="form-group"><label>Role *</label>
+          <select id="newUserRole"><option value="admin">Admin</option><option value="manager">Manager</option><option value="committee">Committee</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createUser()"><i class="fas fa-user-plus"></i> Create User</button>
+    </div>
+  </div>
+</div>
+
+<!-- Asset Detail Modal -->
+<div class="modal-overlay" id="assetDetailModal">
+  <div class="modal" style="max-width:650px">
+    <div class="modal-header">
+      <div class="modal-title" id="adTitle">Asset Detail</div>
+      <button class="modal-close" onclick="closeModal('assetDetailModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="assetDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('assetDetailModal')">Close</button>
+      <button class="btn btn-warning btn-sm manager-only admin-only" id="adStatusBtn" onclick="quickUpdateStatus()"><i class="fas fa-edit"></i> Update Status</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Plan Modal -->
+<div class="modal-overlay" id="addPlanModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-calendar-plus"></i> Add Plan Item</div>
+      <button class="modal-close" onclick="closeModal('addPlanModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Activity Description *</label><input type="text" id="planActivity" placeholder="e.g. Annual lift inspection"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Target Date</label><input type="date" id="planDate"></div>
+        <div class="form-group"><label>Est. Cost (&#8377;)</label><input type="number" id="planCost" placeholder="0" min="0"></div>
+      </div>
+      <div class="form-group"><label>Asset (optional)</label><input type="text" id="planAsset" placeholder="Asset name or tag"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addPlanModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePlan()"><i class="fas fa-plus"></i> Add Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<!-- ==================== SCRIPT ==================== -->
+<script>
+// ============================================================
+// OFFLINE STUBS  (no Firebase)
+// ============================================================
+(function makeStubs() {
+  const col = () => {
+    const s = {
+      onSnapshot: (_cb, errCb) => { if (errCb) errCb(new Error('offline')); return () => {}; },
+      add:    () => Promise.reject(new Error('offline')),
+      doc:    () => ({ get:()=>Promise.reject(new Error('offline')), set:()=>Promise.reject(new Error('offline')), update:()=>Promise.reject(new Error('offline')), delete:()=>Promise.reject(new Error('offline')) }),
+      orderBy:()=>s, where:()=>s, get:()=>Promise.reject(new Error('offline'))
+    };
+    return s;
+  };
+  window.db   = { collection: col };
+  window.auth = {
+    onAuthStateChanged:             cb => cb(null),
+    signInWithEmailAndPassword:     ()  => Promise.reject({ code:'auth/invalid-credential' }),
+    createUserWithEmailAndPassword: ()  => Promise.reject({ code:'auth/invalid-credential' }),
+    signOut:                        ()  => Promise.resolve()
+  };
+})();
+
+// ============================================================
+// LOCALSTORAGE PERSISTENCE
+// ============================================================
+const STORE_KEY = 'societypro_v3';
+function saveStore() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ assets,complaints,amcList,approvals,tasks,oncallServices,users,attendance,nextPlan,societyName,currentTheme })); } catch(e){}
+}
+function loadStore() {
+  try {
+    const d = JSON.parse(localStorage.getItem(STORE_KEY)||'null');
+    if (!d || !d.assets || !d.assets.length) return false;
+    assets=d.assets; complaints=d.complaints||[]; amcList=d.amcList||[];
+    approvals=d.approvals||[]; tasks=d.tasks||[]; oncallServices=d.oncallServices||[];
+    users=d.users||[]; attendance=d.attendance||{}; nextPlan=d.nextPlan||[];
+    societyName=d.societyName||'Green Valley CHS'; currentTheme=d.currentTheme||'default';
+    return true;
+  } catch(e){ return false; }
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser=null, currentRole='';
+let assets=[], complaints=[], amcList=[], approvals=[], tasks=[];
+let oncallServices=[], users=[], attendance={}, nextPlan=[];
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+let charts={};
+let currentComplaintTab='open', currentApprovalTab='pending';
+let viewingAssetId=null;
+let societyName='Green Valley CHS';
+let emailSettings={};
+let currentTheme='default';
+let _toastCount=0;
+const CY=new Date().getFullYear();
+
+// ── Icon map ──────────────────────────────────────────────────
+const ASSET_FA={
+  'Lift':'fa-arrow-up','STP':'fa-water','WTP':'fa-faucet','CCTV System':'fa-video',
+  'Swimming Pool':'fa-swimming-pool','OWC':'fa-recycle','Solar System':'fa-solar-panel',
+  'Fire System':'fa-fire','Water Pump':'fa-cog','Boom Barrier':'fa-car','HVAC':'fa-wind',
+  'BMS':'fa-desktop','Fountain / Water Body':'fa-tint','Gym Equipment':'fa-dumbbell',
+  'Children Play Equipment':'fa-child','AC Unit':'fa-snowflake','Access Control':'fa-lock',
+  'Irrigation System':'fa-leaf','Generator':'fa-bolt','Other':'fa-wrench'
+};
+function assetIcon(type){ return `<i class="fas ${ASSET_FA[type]||'fa-wrench'}"></i>`; }
+
+const STAFF_LIST=[
+  {name:'Head Security',role:'Security'},{name:'Security Guard 1',role:'Security'},
+  {name:'Security Guard 2',role:'Security'},{name:'Housekeeping 1',role:'Housekeeping'},
+  {name:'Housekeeping 2',role:'Housekeeping'},{name:'Gardener',role:'Gardening'},
+  {name:'Pool Operator',role:'Swimming Pool'},{name:'Lifeguard',role:'Swimming Pool'},
+  {name:'STP Operator',role:'STP'},{name:'WTP Operator',role:'WTP'},
+  {name:'Gym Trainer',role:'Gym'},{name:'OWC Operator',role:'OWC'},
+  {name:'Electrician',role:'Electrical'},{name:'Plumber',role:'Plumbing'},
+  {name:'Accountant',role:'Admin'},{name:'Manager',role:'Management'},
+  {name:'Supervisor',role:'Management'}
+];
+
+// ============================================================
+// UTILS
+// ============================================================
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function _q(id){ return document.getElementById(id); }
+function _set(id,val){ const e=_q(id); if(e) e.textContent=val; }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().split('T')[0]; }
+function daysFrom(n){ const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
+function formatDate(v){
+  if(!v) return '—';
+  try{ const d=new Date(v+'T00:00:00'); return isNaN(d)?String(v):d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+  catch(e){ return String(v); }
+}
+function openModal(id){ _q(id)?.classList.add('open'); }
+function closeModal(id){ _q(id)?.classList.remove('open'); }
+function showToast(msg,type='info'){
+  if(_toastCount>=3) return;
+  _toastCount++;
+  const icons={success:'check-circle',error:'times-circle',warning:'exclamation-triangle',info:'info-circle'};
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas fa-${icons[type]||'info-circle'}"></i> ${esc(msg)}`;
+  _q('toastContainer').appendChild(t);
+  setTimeout(()=>{ t.remove(); _toastCount=Math.max(0,_toastCount-1); },4000);
+}
+function validateAmt(val,label){
+  const n=parseFloat(val);
+  if(isNaN(n)||n<0){ showToast(`${label} must be a positive number`,'error'); return null; }
+  return n;
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+auth.onAuthStateChanged(u=>{ if(!u) showAuth(); });
+function showAuth(){ _q('authScreen').style.display='flex'; _q('app').style.display='none'; }
+function demoLogin(role){
+  const map={admin:'admin@society.com',manager:'manager@society.com',committee:'committee@society.com'};
+  _q('loginEmail').value=map[role]; _q('loginPass').value='demo1234'; doLogin();
+}
+function doLogin(){
+  const email=(_q('loginEmail').value||'').trim();
+  const pass=_q('loginPass').value||'';
+  if(!email||!pass){ showToast('Please enter email and password','error'); return; }
+  let role='manager';
+  if(email.includes('admin')) role='admin';
+  else if(email.includes('committee')) role='committee';
+  currentUser={uid:'demo-'+role,email,name:email.split('@')[0],role};
+  initApp();
+}
+function doLogout(){ currentUser=null; showAuth(); }
+
+// ============================================================
+// INIT
+// ============================================================
+function initApp(){
+  _q('authScreen').style.display='none';
+  _q('app').style.display='block';
+  currentRole=currentUser.role;
+  updateSidebarUser();
+  loadSettings();
+  if(currentTheme!=='default') document.documentElement.setAttribute('data-theme',currentTheme);
+  applyRoleVisibility();
+  setTodayDate();
+  // Show dashboard FIRST so canvases are visible before Chart.js renders
+  showPage('dashboard');
+  const hasData=loadStore();
+  if(!hasData) loadDemoData(); else renderAll();
+}
+function updateSidebarUser(){
+  const init=(currentUser.name||'U')[0].toUpperCase();
+  _set('sidebarRole',currentRole[0].toUpperCase()+currentRole.slice(1));
+  _set('sidebarName',currentUser.name); _set('sidebarEmail',currentUser.email);
+  _set('sidebarAvatar',init); _set('topbarAvatar',init);
+  _set('sidebarSociety',societyName);
+}
+function applyRoleVisibility(){
+  const isA=currentRole==='admin', isM=currentRole==='manager';
+  document.querySelectorAll('.admin-only').forEach(e=>e.style.display=isA?'':'none');
+  document.querySelectorAll('.manager-only').forEach(e=>e.style.display=(isA||isM)?'':'none');
+}
+function setTodayDate(){ const el=_q('attDate'); if(el) el.value=today(); }
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  _q('page-'+name)?.classList.add('active');
+  _q('nav-'+name)?.classList.add('active');
+  const titles={dashboard:'Dashboard',assets:'Assets',complaints:'Complaints',amc:'AMC',
+    approvals:'Approvals',calendar:'Calendar',tasks:'Projected Tasks',
+    attendance:'Staff Attendance',oncall:'On-Call Services',reports:'Reports',
+    users:'User Management',settings:'Settings'};
+  const tb=_q('topbarTitle');
+  if(tb){ tb.childNodes[0].textContent=(titles[name]||name)+' '; }
+  const sub=_q('topbarSub'); if(sub) sub.textContent='';
+  if(name==='reports')    renderReportCharts();
+  if(name==='calendar')   renderCalendar();
+  if(name==='attendance') loadAttendanceForDate();
+  applyRoleVisibility();
+  closeSidebar();
+}
+function toggleSidebar(){ _q('sidebar').classList.toggle('open'); _q('sidebarOverlay').classList.toggle('open'); }
+function closeSidebar(){ _q('sidebar').classList.remove('open'); _q('sidebarOverlay').classList.remove('open'); }
+
+// ============================================================
+// KPIs — IDs verified against HTML
+// ============================================================
+function updateKPIs(){
+  const w=assets.filter(a=>a.status==='working').length;
+  const m=assets.filter(a=>a.status==='maintenance').length;
+  const b=assets.filter(a=>a.status==='breakdown').length;
+  const openC=complaints.filter(c=>c.status==='open').length;
+  const aActive=amcList.filter(a=>getAmcStatus(a.expiry)==='active').length;
+  const aExp  =amcList.filter(a=>getAmcStatus(a.expiry)==='expiring').length;
+  const aXpd  =amcList.filter(a=>getAmcStatus(a.expiry)==='expired').length;
+  const todayAtt=attendance[today()]||{};
+  const staffPres=Object.values(todayAtt).filter(v=>v==='present'||v==='half').length;
+  // Dashboard KPIs (exact HTML IDs)
+  _set('kpi-working',w); _set('kpi-maint',m); _set('kpi-breakdown',b);
+  _set('kpi-complaints',openC); _set('kpi-amc',aActive); _set('kpi-staff',staffPres);
+  // AMC page KPIs
+  _set('amcActive',aActive); _set('amcExpiring',aExp); _set('amcExpired',aXpd);
+  // Badges
+  const pendingApp=approvals.filter(a=>a.status==='pending').length;
+  const cb=_q('complaintBadge'),ab=_q('approvalBadge');
+  if(cb){cb.textContent=openC;  cb.style.display=openC?'':'none';}
+  if(ab){ab.textContent=pendingApp; ab.style.display=pendingApp?'':'none';}
+  // Notification dot
+  const dot=document.querySelector('.notif-dot');
+  if(dot) dot.style.display=(aExp>0||aXpd>0||openC>0)?'':'none';
+}
+
+// ============================================================
+// DEMO DATA
+// ============================================================
+function loadDemoData(){
+  assets=[
+    {id:'a1',type:'Lift',tagId:'LIFT-01',location:'Tower A',brand:'Otis',status:'working',installDate:`${CY-5}-01-15`,warranty:`${CY+1}-01-15`,value:500000,notes:''},
+    {id:'a2',type:'Lift',tagId:'LIFT-02',location:'Tower B',brand:'Otis',status:'maintenance',installDate:`${CY-5}-01-15`,warranty:`${CY+1}-01-15`,value:500000,notes:'Cabin door adjustment pending'},
+    {id:'a3',type:'STP',tagId:'STP-01',location:'Basement',brand:'Grundfos',status:'working',installDate:`${CY-6}-06-01`,warranty:`${CY}-06-01`,value:800000,notes:''},
+    {id:'a4',type:'Swimming Pool',tagId:'POOL-01',location:'Podium Level',brand:'',status:'working',installDate:`${CY-7}-03-10`,warranty:'',value:2000000,notes:''},
+    {id:'a5',type:'CCTV System',tagId:'CCTV-01',location:'Common Areas',brand:'Hikvision',status:'working',installDate:`${CY-4}-01-01`,warranty:`${CY+2}-01-01`,value:150000,notes:''},
+    {id:'a6',type:'Fire System',tagId:'FIRE-01',location:'All Floors',brand:'Minimax',status:'breakdown',installDate:`${CY-6}-01-01`,warranty:`${CY}-01-01`,value:300000,notes:'Needs inspection'},
+    {id:'a7',type:'Generator',tagId:'DG-01',location:'Basement',brand:'Kirloskar',status:'working',installDate:`${CY-7}-06-01`,warranty:`${CY-2}-06-01`,value:1500000,notes:''},
+    {id:'a8',type:'WTP',tagId:'WTP-01',location:'Terrace',brand:'',status:'working',installDate:`${CY-6}-06-01`,warranty:`${CY}-06-01`,value:200000,notes:''},
+    {id:'a9',type:'Gym Equipment',tagId:'GYM-01',location:'Gym Room',brand:'Cosco',status:'maintenance',installDate:`${CY-5}-03-01`,warranty:`${CY+1}-03-01`,value:250000,notes:'Treadmill belt due'},
+    {id:'a10',type:'AC Unit',tagId:'AC-01',location:'Office/Club',brand:'Daikin',status:'working',installDate:`${CY-4}-06-01`,warranty:`${CY+2}-06-01`,value:120000,notes:''},
+  ];
+  complaints=[
+    {id:'c1',assetId:'a6',assetName:'Fire System',desc:'Fire alarm panel showing fault',priority:'critical',type:'Breakdown',by:'Security',status:'open',createdAt:daysAgo(2)},
+    {id:'c2',assetId:'a2',assetName:'Lift LIFT-02',desc:'Unusual noise in cabin',priority:'high',type:'Noise Issue',by:'Resident B-402',status:'inprogress',createdAt:daysAgo(1)},
+    {id:'c3',assetId:'a9',assetName:'Gym Equipment',desc:'Treadmill belt slipping',priority:'medium',type:'Routine Maintenance',by:'Gym Member',status:'open',createdAt:daysAgo(0)},
+    {id:'c4',assetId:'a3',assetName:'STP STP-01',desc:'Water level sensor malfunction',priority:'high',type:'Breakdown',by:'Operator',status:'open',createdAt:daysAgo(3)},
+    {id:'c5',assetId:'a5',assetName:'CCTV System',desc:'Camera 4 offline',priority:'medium',type:'Other',by:'Manager',status:'resolved',createdAt:daysAgo(7)},
+  ];
+  amcList=[
+    {id:'amc1',assetId:'a1',assetName:'Lift LIFT-01',vendor:'Otis India',contact:'9876543210',start:`${CY-1}-01-01`,expiry:`${CY+1}-01-01`,amount:120000,type:'Comprehensive',freq:'Monthly',notes:''},
+    {id:'amc2',assetId:'a3',assetName:'STP STP-01',vendor:'Aqua Solutions',contact:'9876543211',start:`${CY-1}-06-01`,expiry:`${CY+1}-06-01`,amount:80000,type:'Non-Comprehensive',freq:'Quarterly',notes:''},
+    {id:'amc3',assetId:'a7',assetName:'Generator DG-01',vendor:'Kirloskar Services',contact:'9876543212',start:`${CY-1}-03-01`,expiry:daysFrom(20),amount:60000,type:'Comprehensive',freq:'Quarterly',notes:'Expiring soon'},
+    {id:'amc4',assetId:'a6',assetName:'Fire System',vendor:'Minimax India',contact:'9876543213',start:`${CY-2}-01-01`,expiry:daysFrom(-10),amount:45000,type:'Comprehensive',freq:'Monthly',notes:'Renewal overdue'},
+  ];
+  approvals=[
+    {id:'ap1',type:'Repair Quotation',assetId:'a6',assetName:'Fire System',desc:'Fire alarm panel replacement.',amount:85000,vendor:'Minimax India',urgency:'critical',status:'pending',requestedBy:'Manager',createdAt:daysAgo(1)},
+    {id:'ap2',type:'AMC Renewal Quotation',assetId:'a1',assetName:'Lift LIFT-01',desc:'AMC renewal for next year.',amount:130000,vendor:'Otis India',urgency:'normal',status:'pending',requestedBy:'Manager',createdAt:daysAgo(3)},
+    {id:'ap3',type:'Capital Expenditure',assetId:'a4',assetName:'Swimming Pool',desc:'Pool resurfacing and pump upgrade.',amount:320000,vendor:'AquaTech',urgency:'urgent',status:'approved',requestedBy:'Manager',remarks:'Approved for Q2',createdAt:daysAgo(15)},
+  ];
+  tasks=[
+    {id:'t1',desc:'Monthly fire system inspection',assetId:'a6',assetName:'Fire System',assigned:'Electrician',due:daysFrom(7),priority:'high',status:'pending'},
+    {id:'t2',desc:'Quarterly pool cleaning',assetId:'a4',assetName:'Swimming Pool',assigned:'Pool Operator',due:daysFrom(14),priority:'medium',status:'pending'},
+    {id:'t3',desc:'Generator load testing',assetId:'a7',assetName:'Generator DG-01',assigned:'Electrician',due:daysFrom(-2),priority:'high',status:'overdue'},
+    {id:'t4',desc:'CCTV camera lens cleaning',assetId:'a5',assetName:'CCTV System',assigned:'Manager',due:daysFrom(3),priority:'low',status:'inprogress'},
+    {id:'t5',desc:'Gym equipment lubrication',assetId:'a9',assetName:'Gym Equipment',assigned:'Supervisor',due:daysFrom(10),priority:'low',status:'done'},
+  ];
+  oncallServices=[
+    {id:'oc1',service:'Pest Control',vendor:'Green Pest',contact:'9876543213',freq:'Monthly',last:daysAgo(30),next:daysFrom(0),status:'due'},
+    {id:'oc2',service:'Tank Cleaning',vendor:'AquaClean',contact:'9876543214',freq:'Quarterly',last:daysAgo(60),next:daysFrom(30),status:'scheduled'},
+    {id:'oc3',service:'Water Pump Service',vendor:'Pump Tech',contact:'9876543215',freq:'Half-Yearly',last:daysAgo(90),next:daysFrom(90),status:'scheduled'},
+  ];
+  users=[
+    {id:'u1',name:'Admin User',email:'admin@society.com',role:'admin',status:'active',createdAt:`${CY}-01-01`},
+    {id:'u2',name:'Rajesh Manager',email:'manager@society.com',role:'manager',status:'active',createdAt:`${CY}-01-01`},
+    {id:'u3',name:'Priya Committee',email:'committee@society.com',role:'committee',status:'active',createdAt:`${CY}-01-01`},
+  ];
+  nextPlan=[]; saveStore(); renderAll();
+}
+
+function renderAll(){
+  updateKPIs();
+  renderAssets(); renderComplaints(); renderAMC(); renderApprovals();
+  renderTasks(); renderOnCall(); renderUsers();
+  renderAttendance(); renderDashboardCharts(); renderDashboardTables();
+  renderCalendar(); populateAssetDropdowns(); renderNextPlan();
+  applyRoleVisibility();
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+function chartColors(){
+  const s=getComputedStyle(document.documentElement);
+  return {
+    text:   s.getPropertyValue('--text').trim()||'#0f172a',
+    muted:  s.getPropertyValue('--text-muted').trim()||'#64748b',
+    border: s.getPropertyValue('--border').trim()||'#e2e8f0'
+  };
+}
+function destroyChart(id){ if(charts[id]){ try{charts[id].destroy();}catch(e){} delete charts[id]; } }
+function makeChart(id,config){
+  destroyChart(id);
+  const el=_q(id); if(!el) return;
+  charts[id]=new Chart(el.getContext('2d'),config);
+}
+
+// Dashboard charts — called via rAF so canvases are painted first
+function renderDashboardCharts(){ requestAnimationFrame(_drawDashCharts); }
+function _drawDashCharts(){
+  const c=chartColors();
+  const w=assets.filter(a=>a.status==='working').length;
+  const m=assets.filter(a=>a.status==='maintenance').length;
+  const b=assets.filter(a=>a.status==='breakdown').length;
+
+  // 1. Asset Status — doughnut (assetPieChart)
+  makeChart('assetPieChart',{
+    type:'doughnut',
+    data:{labels:['Working','Maintenance','Breakdown'],datasets:[{data:[w||0,m||0,b||0],backgroundColor:['#10b981','#f59e0b','#ef4444'],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:c.text,padding:10,font:{size:11}}}}}
+  });
+
+  // 2. Complaints by type — bar (complaintBarChart)
+  const cats={};
+  complaints.forEach(cp=>{cats[cp.type||'Other']=(cats[cp.type||'Other']||0)+1;});
+  const cLabels=Object.keys(cats).length?Object.keys(cats):['No Data'];
+  const cData  =Object.keys(cats).length?Object.values(cats):[0];
+  makeChart('complaintBarChart',{
+    type:'bar',
+    data:{labels:cLabels,datasets:[{data:cData,backgroundColor:'#1a6cf6',borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:c.muted,maxRotation:30}},y:{grid:{color:c.border},ticks:{color:c.muted},beginAtZero:true}}}
+  });
+
+  // 3. Monthly task & breakdown trend — line (maintLineChart)
+  const labels6=[],tData=[],bkData=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
+    const ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    labels6.push(d.toLocaleString('default',{month:'short'}));
+    tData.push(tasks.filter(t=>(t.due||'').startsWith(ym)).length);
+    bkData.push(complaints.filter(cp=>(cp.createdAt||'').startsWith(ym)&&cp.type==='Breakdown').length);
+  }
+  makeChart('maintLineChart',{
+    type:'line',
+    data:{labels:labels6,datasets:[
+      {label:'Tasks',data:tData,borderColor:'#1a6cf6',backgroundColor:'rgba(26,108,246,0.1)',tension:0.4,fill:true,pointRadius:4,pointBackgroundColor:'#1a6cf6'},
+      {label:'Breakdowns',data:bkData,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.1)',tension:0.4,fill:true,pointRadius:4,pointBackgroundColor:'#ef4444'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:c.text,font:{size:11}}}},scales:{x:{grid:{display:false},ticks:{color:c.muted}},y:{grid:{color:c.border},ticks:{color:c.muted},beginAtZero:true}}}
+  });
+
+  // 4. Staff attendance this week — stacked bar (attendanceChart)
+  const days7=[],presArr=[],absArr=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    const da=attendance[ds]||{};
+    const vals=Object.values(da);
+    days7.push(d.toLocaleString('default',{weekday:'short'}));
+    presArr.push(vals.filter(v=>v==='present'||v==='half').length);
+    absArr.push(vals.filter(v=>v==='absent').length);
+  }
+  makeChart('attendanceChart',{
+    type:'bar',
+    data:{labels:days7,datasets:[
+      {label:'Present',data:presArr,backgroundColor:'#10b981',borderRadius:3},
+      {label:'Absent', data:absArr, backgroundColor:'#ef4444',borderRadius:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:c.text,font:{size:11}}}},scales:{x:{grid:{display:false},ticks:{color:c.muted},stacked:true},y:{grid:{color:c.border},ticks:{color:c.muted},beginAtZero:true,stacked:true}}}
+  });
+}
+
+// Report charts — rAF deferred
+function renderReportCharts(){ requestAnimationFrame(_drawReportCharts); }
+function _drawReportCharts(){
+  const c=chartColors();
+
+  // rptComplaintsChart — monthly trend line
+  const m6=[],cc=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
+    const ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    m6.push(d.toLocaleString('default',{month:'short',year:'2-digit'}));
+    cc.push(complaints.filter(cp=>(cp.createdAt||'').startsWith(ym)).length);
+  }
+  makeChart('rptComplaintsChart',{
+    type:'line',
+    data:{labels:m6,datasets:[{label:'Complaints',data:cc,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.1)',tension:0.4,fill:true,pointRadius:4,pointBackgroundColor:'#ef4444'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:c.muted}},y:{grid:{color:c.border},ticks:{color:c.muted},beginAtZero:true}}}
+  });
+
+  // rptBudgetChart — AMC spend by vendor bar
+  const vm={};
+  amcList.forEach(a=>{vm[a.vendor||'Unknown']=(vm[a.vendor||'Unknown']||0)+(a.amount||0);});
+  const vL=Object.keys(vm).length?Object.keys(vm):['No Data'];
+  const vD=Object.keys(vm).length?Object.values(vm):[0];
+  makeChart('rptBudgetChart',{
+    type:'bar',
+    data:{labels:vL,datasets:[{label:'AMC Spend',data:vD,backgroundColor:['#1a6cf6','#10b981','#f59e0b','#ef4444','#7c3aed'],borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:c.muted,maxRotation:30}},y:{grid:{color:c.border},ticks:{color:c.muted,callback:v=>'₹'+Number(v).toLocaleString('en-IN')},beginAtZero:true}}}
+  });
+
+  // rptResponseChart — complaints per asset type bar
+  const tc={};
+  assets.forEach(a=>{const n=complaints.filter(x=>x.assetId===a.id).length; if(n) tc[a.type]=(tc[a.type]||0)+n;});
+  const tL=Object.keys(tc).length?Object.keys(tc):['No Data'];
+  const tD=Object.keys(tc).length?Object.values(tc):[0];
+  makeChart('rptResponseChart',{
+    type:'bar',
+    data:{labels:tL,datasets:[{label:'Complaints',data:tD,backgroundColor:'#f59e0b',borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:c.muted,maxRotation:30}},y:{grid:{color:c.border},ticks:{color:c.muted},beginAtZero:true}}}
+  });
+
+  // rptResolutionChart — task completion doughnut
+  const done=tasks.filter(t=>t.status==='done').length;
+  const pend=tasks.filter(t=>t.status==='pending'||t.status==='inprogress').length;
+  const over=tasks.filter(t=>t.status==='overdue').length;
+  makeChart('rptResolutionChart',{
+    type:'doughnut',
+    data:{labels:['Done','Pending','Overdue'],datasets:[{data:[done||0,pend||0,over||0],backgroundColor:['#10b981','#1a6cf6','#ef4444'],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:c.text,font:{size:11}}}}}
+  });
+}
+
+// Dashboard tables — uses CORRECT HTML IDs: dashComplaintsTable, dashAmcTable
+function renderDashboardTables(){
+  const rc=_q('dashComplaintsTable');
+  if(rc){
+    const recent=complaints.filter(c=>c.status!=='resolved').slice(0,5);
+    rc.innerHTML=recent.length?recent.map(c=>`
+      <tr>
+        <td>${esc(c.assetName||c.assetId)}</td>
+        <td style="max-width:160px">${esc(c.desc)}</td>
+        <td><span class="badge ${c.priority==='critical'||c.priority==='high'?'red':c.priority==='medium'?'yellow':'gray'}">${esc(c.priority)}</span></td>
+        <td><span class="badge ${c.status==='open'?'red':c.status==='inprogress'?'yellow':'green'}">${esc(c.status)}</span></td>
+      </tr>`).join(''):
+      `<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px"><i class="fas fa-check-circle" style="color:#10b981;margin-right:6px"></i>No open complaints</td></tr>`;
+  }
+  const ea=_q('dashAmcTable');
+  if(ea){
+    const exp=amcList.filter(a=>getAmcStatus(a.expiry)!=='active').slice(0,5);
+    ea.innerHTML=exp.length?exp.map(a=>{
+      const st=getAmcStatus(a.expiry);
+      return `<tr><td>${esc(a.assetName||a.assetId)}</td><td>${esc(a.vendor)}</td><td>${esc(a.expiry)}</td><td><span class="badge ${st==='expiring'?'yellow':'red'}">${st}</span></td></tr>`;
+    }).join(''):
+    `<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px"><i class="fas fa-check-circle" style="color:#10b981;margin-right:6px"></i>No expiring AMCs</td></tr>`;
+  }
+}
+
+// ============================================================
+// ASSETS
+// ============================================================
+function renderAssets(){
+  const grid=_q('assetGrid'); if(!grid) return;
+  const q=(_q('assetSearch')?.value||'').toLowerCase();
+  const fil=_q('assetStatusFilter')?.value||'';
+  let list=assets;
+  if(q) list=list.filter(a=>`${a.type} ${a.tagId} ${a.location} ${a.brand}`.toLowerCase().includes(q));
+  if(fil) list=list.filter(a=>a.status===fil);
+  if(!list.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-cubes"></i><h3>No assets found</h3><p>Try adjusting your search or filter</p></div>`;return;}
+  grid.innerHTML=list.map(a=>`
+    <div class="asset-card ${esc(a.status)}" onclick="viewAsset('${esc(a.id)}')">
+      <div class="status-bar"></div>
+      <div class="asset-icon-wrap">${assetIcon(a.type)}</div>
+      <div class="asset-name">${esc(a.type)}</div>
+      <div class="asset-id">${esc(a.tagId)}</div>
+      <span class="asset-status-badge ${esc(a.status)}">${esc(a.status)}</span>
+      <div class="asset-meta"><i class="fas fa-map-marker-alt"></i> ${esc(a.location||'—')}</div>
+    </div>`).join('');
+}
+function openAddAsset(){
+  _q('editAssetId').value='';
+  // HTML field IDs: assetType, assetTagId, assetLocation, assetBrand, assetInstallDate, assetWarranty, assetValue, assetNotes, assetStatus
+  ['assetTagId','assetLocation','assetBrand','assetInstallDate','assetWarranty','assetNotes'].forEach(id=>{const e=_q(id);if(e)e.value='';});
+  const v=_q('assetValue'); if(v) v.value='';
+  const s=_q('assetStatus'); if(s) s.value='working';
+  openModal('addAssetModal');
+}
+function saveAsset(){
+  const tagId=(_q('assetTagId')?.value||'').trim();
+  const type=_q('assetType')?.value||'';
+  if(!tagId||!type){showToast('Asset type and Tag ID required','error');return;}
+  // Duplicate Tag ID check
+  const editId=_q('editAssetId')?.value||'';
+  if(assets.find(a=>a.tagId===tagId&&a.id!==editId)){showToast('Tag ID already exists','error');return;}
+  const amt=validateAmt(_q('assetValue')?.value||'0','Purchase value'); if(amt===null) return;
+  const data={type,tagId,location:(_q('assetLocation')?.value||'').trim(),brand:(_q('assetBrand')?.value||'').trim(),
+    status:_q('assetStatus')?.value||'working',installDate:_q('assetInstallDate')?.value||'',
+    warranty:_q('assetWarranty')?.value||'',value:amt,notes:(_q('assetNotes')?.value||'').trim()};
+  if(editId){const i=assets.findIndex(x=>x.id===editId);if(i>=0)Object.assign(assets[i],data);showToast('Asset updated!','success');}
+  else{data.id='a-'+Date.now();assets.push(data);showToast('Asset added!','success');}
+  renderAssets();updateKPIs();renderDashboardCharts();populateAssetDropdowns();
+  closeModal('addAssetModal');saveStore();
+}
+function viewAsset(id){
+  const a=assets.find(x=>x.id===id); if(!a) return;
+  viewingAssetId=id;
+  const adT=_q('adTitle'); if(adT) adT.innerHTML=`${assetIcon(a.type)} ${esc(a.type)} &mdash; ${esc(a.tagId)}`;
+  const relC=complaints.filter(c=>c.assetId===id);
+  const relA=amcList.filter(m=>m.assetId===id);
+  const canEdit=currentRole==='admin'||currentRole==='manager';
+  _q('assetDetailBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      ${[['Location',a.location],['Brand / Model',a.brand],['Install Date',a.installDate],['Warranty Until',a.warranty]].map(([l,v])=>`
+        <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">${l}</div><div style="font-weight:600">${esc(v||'—')}</div></div>`).join('')}
+      <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Status</div><span class="asset-status-badge ${esc(a.status)}">${esc(a.status)}</span></div>
+      <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Purchase Value</div><div style="font-weight:600">&#8377;${Number(a.value||0).toLocaleString('en-IN')}</div></div>
+    </div>
+    ${a.notes?`<div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:16px;font-size:14px;color:var(--text-muted)">${esc(a.notes)}</div>`:''}
+    <div style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:8px">Complaints (${relC.length})</div>
+      ${relC.length?relC.map(c=>`<div style="background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:6px;font-size:13px">
+        <span class="badge ${c.priority==='critical'||c.priority==='high'?'red':c.priority==='medium'?'yellow':'gray'}">${esc(c.priority)}</span> ${esc(c.desc)}
+        <span class="badge ${c.status==='open'?'red':c.status==='inprogress'?'yellow':'green'}" style="margin-left:8px">${esc(c.status)}</span>
+      </div>`).join(''):`<div style="color:var(--text-muted);font-size:13px">No complaints</div>`}
+    </div>
+    <div><div style="font-weight:700;margin-bottom:8px">AMC Records (${relA.length})</div>
+      ${relA.length?relA.map(m=>`<div style="background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:6px;font-size:13px">
+        ${esc(m.vendor)} — Expiry: ${esc(m.expiry)} <span class="badge ${getAmcStatus(m.expiry)==='active'?'green':getAmcStatus(m.expiry)==='expiring'?'yellow':'red'}">${getAmcStatus(m.expiry)}</span>
+      </div>`).join(''):`<div style="color:var(--text-muted);font-size:13px">No AMC records</div>`}
+    </div>
+    ${canEdit?`<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
+      <label style="font-size:13px;font-weight:600;margin-bottom:8px;display:block">Quick Status Update</label>
+      <select id="quickStatusSel" style="padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font-main)">
+        <option value="working" ${a.status==='working'?'selected':''}>Working</option>
+        <option value="maintenance" ${a.status==='maintenance'?'selected':''}>Maintenance</option>
+        <option value="breakdown" ${a.status==='breakdown'?'selected':''}>Breakdown</option>
+      </select></div>`:''}`;
+  const btn=_q('adStatusBtn'); if(btn) btn.style.display=canEdit?'':'none';
+  openModal('assetDetailModal');
+}
+function quickUpdateStatus(){
+  if(currentRole==='committee'){showToast('Permission denied','error');return;}
+  const sel=_q('quickStatusSel');
+  if(!sel||!viewingAssetId){showToast('Status update not available','error');return;}
+  const i=assets.findIndex(x=>x.id===viewingAssetId);
+  if(i>=0) assets[i].status=sel.value;
+  renderAssets();updateKPIs();renderDashboardCharts();
+  showToast('Status updated!','success');closeModal('assetDetailModal');saveStore();
+}
+function filterAssets(){renderAssets();}
+
+// ============================================================
+// COMPLAINTS
+// ============================================================
+function renderComplaints(){
+  const tbody=_q('complaintsTable'); if(!tbody) return;
+  const q=(_q('complaintSearch')?.value||'').toLowerCase();
+  let list=complaints.filter(c=>currentComplaintTab==='all'?true:c.status===currentComplaintTab);
+  if(q) list=list.filter(c=>`${c.desc} ${c.assetName} ${c.by} ${c.type}`.toLowerCase().includes(q));
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><i class="fas fa-clipboard-check"></i><h3>No complaints found</h3></div></td></tr>`;return;}
+  tbody.innerHTML=list.map((c,i)=>`
+    <tr>
+      <td>#${i+1}</td><td>${esc(c.assetName||c.assetId)}</td>
+      <td style="max-width:180px">${esc(c.desc)}</td>
+      <td><span class="badge ${c.priority==='critical'||c.priority==='high'?'red':c.priority==='medium'?'yellow':'gray'}">${esc(c.priority)}</span></td>
+      <td>${esc(c.by||'—')}</td><td>${formatDate(c.createdAt)}</td>
+      <td><span class="badge ${c.status==='open'?'red':c.status==='inprogress'?'yellow':'green'}">${esc(c.status)}</span></td>
+      <td>${currentRole!=='committee'?`
+        <select onchange="updateComplaintStatus('${esc(c.id)}',this.value)" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-main)">
+          <option value="open" ${c.status==='open'?'selected':''}>Open</option>
+          <option value="inprogress" ${c.status==='inprogress'?'selected':''}>In Progress</option>
+          <option value="resolved" ${c.status==='resolved'?'selected':''}>Resolved</option>
+        </select>`:`<span class="badge ${c.status==='open'?'red':c.status==='inprogress'?'yellow':'green'}">${esc(c.status)}</span>`}
+      </td>
+    </tr>`).join('');
+}
+function switchComplaintTab(tab,btn){
+  currentComplaintTab=tab;
+  document.querySelectorAll('#page-complaints .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const s=_q('complaintSearch');if(s)s.value='';
+  renderComplaints();
+}
+function openAddComplaint(){
+  _q('editComplaintId').value='';
+  ['cmpDesc','cmpBy'].forEach(id=>{const e=_q(id);if(e)e.value='';});
+  populateAssetDropdown('cmpAsset');openModal('addComplaintModal');
+}
+function saveComplaint(){
+  const assetSel=_q('cmpAsset');
+  const desc=(_q('cmpDesc')?.value||'').trim();
+  if(!desc){showToast('Issue description required','error');return;}
+  const data={id:'c-'+Date.now(),assetId:assetSel?.value||'',assetName:assetSel?.options[assetSel.selectedIndex]?.text||'',
+    desc,priority:_q('cmpPriority')?.value||'medium',type:_q('cmpType')?.value||'Other',
+    by:(_q('cmpBy')?.value||'').trim()||currentUser.name,status:'open',createdAt:today()};
+  complaints.unshift(data);
+  renderComplaints();updateKPIs();renderDashboardTables();renderDashboardCharts();
+  closeModal('addComplaintModal');showToast('Complaint logged!','success');
+  sendEmailEvent('complaint',`New complaint: ${desc}`);saveStore();
+}
+function updateComplaintStatus(id,status){
+  const i=complaints.findIndex(x=>x.id===id); if(i>=0) complaints[i].status=status;
+  updateKPIs();renderDashboardTables();renderDashboardCharts();
+  showToast('Status updated','success');saveStore();
+}
+function filterComplaints(q){renderComplaints();}
+
+// ============================================================
+// AMC
+// ============================================================
+function getAmcStatus(expiry){
+  if(!expiry) return 'active';
+  // Use UTC noon to avoid timezone edge issues
+  const now=new Date(); now.setHours(12,0,0,0);
+  const exp=new Date(expiry+'T12:00:00');
+  const diff=(exp-now)/86400000;
+  if(diff<0) return 'expired';
+  if(diff<=30) return 'expiring';
+  return 'active';
+}
+function renderAMC(){
+  const tbody=_q('amcTable'); if(!tbody) return;
+  const q=(_q('amcSearch')?.value||'').toLowerCase();
+  let list=amcList;
+  if(q) list=list.filter(a=>`${a.assetName} ${a.vendor} ${a.contact}`.toLowerCase().includes(q));
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><i class="fas fa-file-contract"></i><h3>No AMC records found</h3></div></td></tr>`;return;}
+  tbody.innerHTML=list.map(a=>{
+    const st=getAmcStatus(a.expiry);
+    return`<tr class="${st==='expiring'?'expiry-soon':st==='expired'?'expiry-critical':''}">
+      <td>${esc(a.assetName||a.assetId)}</td><td>${esc(a.vendor)}</td><td>${esc(a.contact||'—')}</td>
+      <td>${esc(a.start)}</td><td>${esc(a.expiry)}</td>
+      <td>&#8377;${Number(a.amount||0).toLocaleString('en-IN')}</td>
+      <td><span class="badge ${st==='active'?'green':st==='expiring'?'yellow':'red'}">${st}</span></td>
+      <td>${currentRole!=='committee'?`
+        <button class="btn btn-sm btn-secondary" onclick="editAMC('${esc(a.id)}')"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAMC('${esc(a.id)}')"><i class="fas fa-trash"></i></button>`:'—'}
+      </td></tr>`;
+  }).join('');updateKPIs();
+}
+function openAddAMC(){
+  _q('editAmcId').value='';
+  ['amcVendor','amcContact','amcAmount','amcStart','amcExpiry','amcNotes'].forEach(id=>{const e=_q(id);if(e)e.value='';});
+  populateAssetDropdown('amcAsset');openModal('addAmcModal');
+}
+function editAMC(id){
+  const a=amcList.find(x=>x.id===id);if(!a)return;
+  _q('editAmcId').value=id; populateAssetDropdown('amcAsset',a.assetId);
+  _q('amcVendor').value=a.vendor||''; _q('amcContact').value=a.contact||'';
+  _q('amcAmount').value=a.amount||''; _q('amcStart').value=a.start||'';
+  _q('amcExpiry').value=a.expiry||''; _q('amcNotes').value=a.notes||'';
+  const t=_q('amcType');if(t)t.value=a.type||'Comprehensive';
+  const f=_q('amcFreq');if(f)f.value=a.freq||'Monthly';
+  openModal('addAmcModal');
+}
+function saveAMC(){
+  const aS=_q('amcAsset');
+  const vendor=(_q('amcVendor')?.value||'').trim();
+  const expiry=_q('amcExpiry')?.value||'';
+  if(!vendor||!expiry){showToast('Vendor and expiry date required','error');return;}
+  const amt=validateAmt(_q('amcAmount')?.value||'0','Amount');if(amt===null)return;
+  const data={assetId:aS?.value||'',assetName:aS?.options[aS.selectedIndex]?.text||'',vendor,
+    contact:_q('amcContact')?.value||'',amount:amt,start:_q('amcStart')?.value||'',expiry,
+    type:_q('amcType')?.value||'Comprehensive',freq:_q('amcFreq')?.value||'Monthly',notes:_q('amcNotes')?.value||''};
+  const editId=_q('editAmcId')?.value||'';
+  if(editId){const i=amcList.findIndex(x=>x.id===editId);if(i>=0)Object.assign(amcList[i],data);showToast('AMC updated!','success');}
+  else{data.id='amc-'+Date.now();amcList.push(data);showToast('AMC added!','success');}
+  renderAMC();updateKPIs();closeModal('addAmcModal');saveStore();
+}
+function deleteAMC(id){
+  if(!confirm('Delete this AMC record?'))return;
+  amcList=amcList.filter(x=>x.id!==id);renderAMC();updateKPIs();showToast('Deleted!','success');saveStore();
+}
+function filterAMC(q){renderAMC();}
+
+// ============================================================
+// APPROVALS
+// ============================================================
+function renderApprovals(){
+  const container=_q('approvalsContainer');if(!container)return;
+  const filtered=approvals.filter(a=>a.status===currentApprovalTab);
+  if(!filtered.length){container.innerHTML=`<div class="empty-state"><i class="fas fa-check-double"></i><h3>No ${currentApprovalTab} requests</h3></div>`;return;}
+  container.innerHTML=filtered.map(a=>`
+    <div class="approval-card">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div class="kpi-icon ${a.urgency==='critical'?'red':a.urgency==='urgent'?'yellow':'blue'}" style="width:44px;height:44px;flex-shrink:0"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div style="flex:1">
+          <div class="approval-title">${esc(a.type)}</div>
+          <div class="approval-meta">
+            <span><i class="fas fa-cubes"></i> ${esc(a.assetName||'—')}</span>
+            <span><i class="fas fa-rupee-sign"></i> &#8377;${Number(a.amount||0).toLocaleString('en-IN')}</span>
+            <span><i class="fas fa-building"></i> ${esc(a.vendor||'—')}</span>
+            <span><i class="fas fa-user"></i> ${esc(a.requestedBy||'—')}</span>
+            <span><i class="fas fa-calendar"></i> ${formatDate(a.createdAt)}</span>
+            <span class="badge ${a.urgency==='critical'?'red':a.urgency==='urgent'?'yellow':'blue'}">${esc(a.urgency)}</span>
+          </div>
+          <div style="font-size:14px;color:var(--text-muted)">${esc(a.desc)}</div>
+          ${a.status!=='pending'?`<div style="margin-top:8px"><span class="badge ${a.status==='approved'?'green':'red'}">${esc(a.status)}</span>${a.remarks?` — ${esc(a.remarks)}`:''}</div>`:''}
+          ${(currentRole==='admin'||currentRole==='committee')&&a.status==='pending'?`
+          <div class="approval-actions">
+            <input type="text" id="remarks-${esc(a.id)}" placeholder="Remarks (optional)" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;flex:1;font-family:var(--font-main)">
+            <button class="btn btn-success btn-sm" onclick="processApproval('${esc(a.id)}','approved')"><i class="fas fa-check"></i> Approve</button>
+            <button class="btn btn-danger btn-sm" onclick="processApproval('${esc(a.id)}','rejected')"><i class="fas fa-times"></i> Reject</button>
+          </div>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+function switchApprovalTab(tab,btn){
+  currentApprovalTab=tab;
+  document.querySelectorAll('#page-approvals .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderApprovals();
+}
+function openAddApproval(){populateAssetDropdown('aprAsset');openModal('addApprovalModal');}
+function saveApproval(){
+  const desc=(_q('aprDesc')?.value||'').trim();if(!desc){showToast('Description required','error');return;}
+  const amt=validateAmt(_q('aprAmount')?.value||'0','Amount');if(amt===null)return;
+  const aS=_q('aprAsset');
+  const data={id:'ap-'+Date.now(),type:_q('aprType')?.value||'Repair Quotation',
+    assetId:aS?.value||'',assetName:aS?.options[aS.selectedIndex]?.text||'',
+    desc,amount:amt,urgency:_q('aprUrgency')?.value||'normal',
+    vendor:(_q('aprVendor')?.value||'').trim(),requestedBy:currentUser.name,
+    status:'pending',createdAt:today()};
+  approvals.unshift(data);renderApprovals();updateKPIs();
+  closeModal('addApprovalModal');showToast('Approval request submitted!','success');
+  sendEmailEvent('approval',`New approval: ${desc}`);saveStore();
+}
+function processApproval(id,status){
+  const rem=_q('remarks-'+id);
+  const remarks=rem?rem.value.trim():'';
+  const i=approvals.findIndex(x=>x.id===id);
+  if(i>=0) Object.assign(approvals[i],{status,remarks});
+  renderApprovals();updateKPIs();
+  showToast(`Request ${status}!`,status==='approved'?'success':'warning');saveStore();
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+function renderCalendar(){
+  const grid=_q('calGrid'),title=_q('calTitle');if(!grid)return;
+  const t=new Date();
+  const first=new Date(calYear,calMonth,1),last=new Date(calYear,calMonth+1,0);
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  if(title)title.textContent=`${MONTHS[calMonth]} ${calYear}`;
+  let html='';
+  for(let i=0;i<first.getDay();i++) html+='<div class="cal-day other-month"></div>';
+  for(let d=1;d<=last.getDate();d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=t.getFullYear()===calYear&&t.getMonth()===calMonth&&t.getDate()===d;
+    const dayTasks=tasks.filter(t=>t.due===ds);
+    const dayAMC=amcList.filter(a=>a.expiry===ds);
+    html+=`<div class="cal-day${isToday?' today':''}">
+      <div class="cal-date">${d}</div>
+      ${dayTasks.map(t=>`<div class="cal-event ${t.status==='done'?'green':t.status==='inprogress'?'blue':t.priority==='high'||t.status==='overdue'?'red':'yellow'}" title="${esc(t.desc)}">${esc(t.desc)}</div>`).join('')}
+      ${dayAMC.map(a=>`<div class="cal-event red" title="AMC Expiry">AMC: ${esc(a.assetName||a.assetId)}</div>`).join('')}
+    </div>`;
+  }
+  grid.innerHTML=html;
+}
+function changeMonth(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+
+// ============================================================
+// TASKS
+// ============================================================
+function renderTasks(){
+  const tbody=_q('tasksTable');if(!tbody)return;
+  const t=today();
+  tasks.forEach(tk=>{if(tk.due<t&&tk.status==='pending')tk.status='overdue';});
+  if(!tasks.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fas fa-tasks"></i><h3>No tasks yet</h3></div></td></tr>`;return;}
+  tbody.innerHTML=tasks.map(tk=>`
+    <tr>
+      <td>${esc(tk.desc)}</td><td>${esc(tk.assetName||'—')}</td><td>${esc(tk.assigned||'—')}</td>
+      <td>${esc(tk.due||'—')}</td>
+      <td><span class="badge ${tk.priority==='high'?'red':tk.priority==='medium'?'yellow':'gray'}">${esc(tk.priority)}</span></td>
+      <td><span class="badge ${tk.status==='done'?'green':tk.status==='inprogress'?'blue':tk.status==='overdue'?'red':'gray'}">${esc(tk.status)}</span></td>
+      <td>${currentRole!=='committee'?`
+        <select onchange="updateTaskStatus('${esc(tk.id)}',this.value)" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-main)">
+          <option value="pending" ${tk.status==='pending'?'selected':''}>Pending</option>
+          <option value="inprogress" ${tk.status==='inprogress'?'selected':''}>In Progress</option>
+          <option value="done" ${tk.status==='done'?'selected':''}>Done</option>
+        </select>
+        <button class="btn btn-danger btn-xs" onclick="deleteTask('${esc(tk.id)}')"><i class="fas fa-trash"></i></button>`
+        :`<span class="badge ${tk.status==='done'?'green':tk.status==='inprogress'?'blue':tk.status==='overdue'?'red':'gray'}">${esc(tk.status)}</span>`}
+      </td>
+    </tr>`).join('');
+}
+function openAddTask(){
+  ['taskDesc','taskAssigned','taskDue'].forEach(id=>{const e=_q(id);if(e)e.value='';});
+  populateAssetDropdown('taskAsset');openModal('addTaskModal');
+}
+function saveTask(){
+  const desc=(_q('taskDesc')?.value||'').trim(),due=_q('taskDue')?.value||'';
+  if(!desc||!due){showToast('Description and due date required','error');return;}
+  const aS=_q('taskAsset');
+  tasks.push({id:'t-'+Date.now(),desc,assetId:aS?.value||'',assetName:aS?.options[aS.selectedIndex]?.text||'',
+    assigned:(_q('taskAssigned')?.value||'').trim(),due,priority:_q('taskPriority')?.value||'medium',status:'pending'});
+  renderTasks();renderCalendar();closeModal('addTaskModal');showToast('Task added!','success');saveStore();
+}
+function updateTaskStatus(id,status){
+  const i=tasks.findIndex(x=>x.id===id);if(i>=0)tasks[i].status=status;
+  updateKPIs();renderCalendar();renderDashboardCharts();
+  showToast('Task updated','success');saveStore();
+}
+function deleteTask(id){
+  if(!confirm('Delete this task?'))return;
+  tasks=tasks.filter(x=>x.id!==id);renderTasks();renderCalendar();showToast('Task deleted','success');saveStore();
+}
+
+// ============================================================
+// ATTENDANCE — IDs: attDate, attPresent, attAbsent, attHalf, attendanceGrid
+// ============================================================
+function loadAttendanceForDate(){
+  const el=_q('attDate');
+  renderAttendance(el?el.value:today());
+}
+function renderAttendance(date){
+  if(!date){const el=_q('attDate');date=el?el.value:today();}
+  const grid=_q('attendanceGrid');if(!grid)return;
+  const dayAtt=attendance[date]||{};
+  grid.innerHTML=STAFF_LIST.map(s=>{
+    const key=s.name.replace(/\s+/g,'_');
+    const cur=dayAtt[key]||'';
+    return`<div class="staff-card">
+      <div class="staff-header">
+        <div class="staff-avatar"><i class="fas fa-user"></i></div>
+        <div><div class="staff-name">${esc(s.name)}</div><div class="staff-role">${esc(s.role)}</div></div>
+      </div>
+      <div class="att-toggle">
+        <button class="att-btn ${cur==='present'?'present':''}" onclick="markAtt('${key}','present','${date}',this,'present')">Present</button>
+        <button class="att-btn ${cur==='absent'?'absent':''}" onclick="markAtt('${key}','absent','${date}',this,'absent')">Absent</button>
+        <button class="att-btn ${cur==='half'?'half':''}" onclick="markAtt('${key}','half','${date}',this,'half')">Half</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateAttKPIs(dayAtt);
+}
+function markAtt(key,val,date,btn,type){
+  if(!attendance[date])attendance[date]={};
+  attendance[date][key]=val;
+  btn.closest('.staff-card').querySelectorAll('.att-btn').forEach(b=>b.className='att-btn');
+  btn.classList.add(type);
+  updateAttKPIs(attendance[date]);
+  updateKPIs();saveStore();
+}
+function updateAttKPIs(dayAtt){
+  const vals=Object.values(dayAtt);
+  _set('attPresent',vals.filter(v=>v==='present').length);
+  _set('attAbsent',vals.filter(v=>v==='absent').length);
+  _set('attHalf',vals.filter(v=>v==='half').length);
+  _set('kpi-staff',vals.filter(v=>v==='present'||v==='half').length);
+}
+function saveAttendance(){showToast('Attendance saved!','success');saveStore();}
+function exportAttendance(){
+  const date=_q('attDate')?.value||today();
+  const dayAtt=attendance[date]||{};
+  let csv='Staff Name,Role,Status\n';
+  STAFF_LIST.forEach(s=>{const key=s.name.replace(/\s+/g,'_');csv+=`"${s.name}","${s.role}","${dayAtt[key]||'not marked'}"\n`;});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`attendance_${date}.csv`;a.click();
+}
+
+// ============================================================
+// ON-CALL — HTML field IDs: ocService, ocVendor, ocContact, ocFreq, ocLast, ocNext
+// ============================================================
+function renderOnCall(){
+  const tbody=_q('oncallTable');if(!tbody)return;
+  if(!oncallServices.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><i class="fas fa-phone-alt"></i><h3>No on-call services</h3></div></td></tr>`;return;}
+  tbody.innerHTML=oncallServices.map(s=>`
+    <tr>
+      <td>${esc(s.service)}</td><td>${esc(s.vendor)}</td><td>${esc(s.contact)}</td>
+      <td>${esc(s.freq)}</td><td>${esc(s.last||'—')}</td><td>${esc(s.next||'—')}</td>
+      <td><span class="badge ${s.status==='due'||s.status==='overdue'?'red':'green'}">${esc(s.status)}</span></td>
+      <td>${currentRole!=='committee'?`
+        <button class="btn btn-success btn-xs" onclick="markServiceDone('${esc(s.id)}')"><i class="fas fa-check"></i></button>
+        <button class="btn btn-danger btn-xs" onclick="deleteOnCall('${esc(s.id)}')"><i class="fas fa-trash"></i></button>`:'—'}
+      </td>
+    </tr>`).join('');
+}
+function openAddOnCall(){
+  // Clear fields using CORRECT HTML IDs
+  ['ocVendor','ocContact','ocLast','ocNext'].forEach(id=>{const e=_q(id);if(e)e.value='';});
+  const os=_q('ocService');if(os)os.selectedIndex=0;
+  const of_=_q('ocFreq');if(of_)of_.selectedIndex=0;
+  openModal('addOnCallModal');
+}
+function saveOnCall(){
+  // Read using CORRECT HTML IDs: ocService (select), ocVendor, ocContact, ocFreq, ocLast, ocNext
+  const service=_q('ocService')?.value||'';
+  const vendor=(_q('ocVendor')?.value||'').trim();
+  if(!service||!vendor){showToast('Service type and vendor required','error');return;}
+  oncallServices.push({
+    id:'oc-'+Date.now(),service,vendor,
+    contact:(_q('ocContact')?.value||'').trim(),
+    freq:_q('ocFreq')?.value||'Monthly',
+    last:_q('ocLast')?.value||'—',
+    next:_q('ocNext')?.value||'',
+    status:'scheduled'
+  });
+  renderOnCall();closeModal('addOnCallModal');showToast('Service added!','success');saveStore();
+}
+function markServiceDone(id){
+  const i=oncallServices.findIndex(x=>x.id===id);if(i<0)return;
+  oncallServices[i].last=today();oncallServices[i].status='scheduled';
+  renderOnCall();showToast('Service marked done','success');saveStore();
+}
+function deleteOnCall(id){
+  if(!confirm('Delete this service?'))return;
+  oncallServices=oncallServices.filter(x=>x.id!==id);
+  renderOnCall();showToast('Deleted!','success');saveStore();
+}
+
+// ============================================================
+// USERS
+// ============================================================
+function renderUsers(){
+  const tbody=_q('usersTable');if(!tbody)return;
+  if(!users.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fas fa-users"></i><h3>No users</h3></div></td></tr>`;return;}
+  tbody.innerHTML=users.map((u,i)=>`
+    <tr>
+      <td>#${i+1}</td><td>${esc(u.name)}</td><td>${esc(u.email)}</td>
+      <td><span class="badge ${u.role==='admin'?'red':u.role==='manager'?'blue':'gray'}">${esc(u.role)}</span></td>
+      <td><span class="badge ${u.status==='active'?'green':'gray'}">${esc(u.status||'active')}</span></td>
+      <td>${esc(u.createdAt||'—')}</td>
+      <td><button class="btn btn-danger btn-xs" onclick="deleteUser('${esc(u.id)}')"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('');
+}
+function openAddUser(){openModal('addUserModal');}
+function createUser(){
+  const name=(_q('newUserName')?.value||'').trim();
+  const email=(_q('newUserEmail')?.value||'').trim();
+  const pass=_q('newUserPass')?.value||'';
+  const role=_q('newUserRole')?.value||'manager';
+  if(!name||!email||!pass){showToast('All fields required','error');return;}
+  if(pass.length<6){showToast('Password must be at least 6 characters','error');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Invalid email address','error');return;}
+  if(users.find(u=>u.email===email)){showToast('Email already exists','error');return;}
+  users.push({id:'u-'+Date.now(),name,email,role,status:'active',createdAt:today()});
+  renderUsers();closeModal('addUserModal');
+  ['newUserName','newUserEmail','newUserPass'].forEach(id=>{const e=_q(id);if(e)e.value='';});
+  showToast('User created!','success');saveStore();
+}
+function deleteUser(id){
+  if(!confirm('Delete this user?'))return;
+  users=users.filter(x=>x.id!==id);renderUsers();showToast('User deleted','success');saveStore();
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+function switchReportTab(tab,btn){
+  document.querySelectorAll('#page-reports .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#page-reports .tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  _q('report-'+tab)?.classList.add('active');
+  if(tab!=='nextplan')renderReportCharts();
+}
+
+// ============================================================
+// NEXT PLAN
+// ============================================================
+function renderNextPlan(){
+  const cont=_q('nextPlanContainer');if(!cont)return;
+  if(!nextPlan.length){cont.innerHTML='<div style="color:var(--text-muted);font-size:14px;padding:20px 0">No planned items yet.</div>';return;}
+  cont.innerHTML=`<div class="table-overflow"><table style="width:100%">
+    <thead><tr><th style="padding:8px 12px;text-align:left;font-size:12px;color:var(--text-muted)">Activity</th><th>Asset</th><th>Target Date</th><th>Est. Cost</th><th></th></tr></thead>
+    <tbody>`+nextPlan.map((p,i)=>`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px">${esc(p.activity)}</td><td>${esc(p.asset||'—')}</td><td>${esc(p.date||'—')}</td>
+      <td>${p.cost?'&#8377;'+parseFloat(p.cost).toLocaleString('en-IN'):'—'}</td>
+      <td><button class="btn btn-danger btn-xs" onclick="removePlan(${i})"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('')+`</tbody></table></div>`;
+}
+function openAddPlan(){openModal('addPlanModal');}
+function savePlan(){
+  const activity=(_q('planActivity')?.value||'').trim();
+  if(!activity){showToast('Activity description required','error');return;}
+  nextPlan.push({activity,date:_q('planDate')?.value||'',cost:_q('planCost')?.value||'',asset:(_q('planAsset')?.value||'').trim()});
+  renderNextPlan();closeModal('addPlanModal');
+  ['planActivity','planDate','planCost','planAsset'].forEach(id=>{const e=_q(id);if(e)e.value='';});
+  showToast('Plan item added!','success');saveStore();
+}
+function removePlan(i){nextPlan.splice(i,1);renderNextPlan();saveStore();}
+function generateReport(){showToast('PDF export requires server-side integration','info');}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function loadSettings(){
+  try{
+    const raw=localStorage.getItem('societypro_settings');if(!raw)return;
+    const s=JSON.parse(raw);
+    if(s.societyName){societyName=s.societyName;const e=_q('set-societyName');if(e)e.value=societyName;}
+    if(s.emailSettings){
+      emailSettings=s.emailSettings;
+      ['serviceId','templateId','publicKey'].forEach(f=>{const e=_q('ejs'+f[0].toUpperCase()+f.slice(1));if(e)e.value=emailSettings[f]||'';});
+    }
+    if(s.theme){
+      currentTheme=s.theme;
+      document.documentElement.setAttribute('data-theme',currentTheme==='default'?'':currentTheme);
+      document.querySelectorAll('.theme-opt').forEach(o=>o.classList.toggle('active',o.getAttribute('onclick')?.includes(`'${currentTheme}'`)));
+    }
+  }catch(e){}
+}
+function saveSocietySettings(){
+  const el=_q('set-societyName');if(el&&el.value.trim()){societyName=el.value.trim();_set('sidebarSociety',societyName);}
+  const stored=JSON.parse(localStorage.getItem('societypro_settings')||'{}');
+  stored.societyName=societyName;
+  localStorage.setItem('societypro_settings',JSON.stringify(stored));
+  showToast('Settings saved!','success');saveStore();
+}
+function saveEmailSettings(){
+  emailSettings={
+    serviceId:_q('ejsServiceId')?.value||'',templateId:_q('ejsTemplateId')?.value||'',publicKey:_q('ejsPublicKey')?.value||'',
+    events:{
+      breakdown:{emails:_q('email-breakdown')?.value||'',enabled:_q('tog-breakdown')?.checked||false},
+      amc:{emails:_q('email-amc')?.value||'',enabled:_q('tog-amc')?.checked||false},
+      complaint:{emails:_q('email-complaint')?.value||'',enabled:_q('tog-complaint')?.checked||false},
+      approval:{emails:_q('email-approval')?.value||'',enabled:_q('tog-approval')?.checked||false},
+      overdue:{emails:_q('email-overdue')?.value||'',enabled:_q('tog-overdue')?.checked||false},
+    }
+  };
+  // EmailJS v3 syntax (library loaded is emailjs-com@3)
+  if(emailSettings.publicKey&&typeof emailjs!=='undefined') emailjs.init(emailSettings.publicKey);
+  const stored=JSON.parse(localStorage.getItem('societypro_settings')||'{}');
+  stored.emailSettings=emailSettings;
+  localStorage.setItem('societypro_settings',JSON.stringify(stored));
+  showToast('Email settings saved!','success');
+}
+function sendEmailEvent(event,message){
+  if(!emailSettings.serviceId||!emailSettings.templateId||!emailSettings.publicKey)return;
+  if(typeof emailjs==='undefined')return;
+  const evt=emailSettings.events?.[event];
+  if(!evt?.enabled)return;
+  (evt.emails||'').split(',').map(e=>e.trim()).filter(Boolean).forEach(to=>{
+    emailjs.send(emailSettings.serviceId,emailSettings.templateId,{to_email:to,subject:`SocietyPro: ${event}`,message,society:societyName}).catch(()=>{});
+  });
+}
+
+// ============================================================
+// THEMES
+// ============================================================
+function applyTheme(theme,el){
+  currentTheme=theme;
+  document.documentElement.setAttribute('data-theme',theme==='default'?'':theme);
+  document.querySelectorAll('.theme-opt').forEach(o=>o.classList.remove('active'));
+  if(el)el.classList.add('active');
+  Object.keys(charts).forEach(k=>{try{charts[k].destroy();}catch(e){}delete charts[k];});
+  renderDashboardCharts();renderReportCharts();
+  const stored=JSON.parse(localStorage.getItem('societypro_settings')||'{}');
+  stored.theme=theme;localStorage.setItem('societypro_settings',JSON.stringify(stored));
+  saveStore();
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+const readNotifIds=new Set();
+function loadNotifications(){
+  const notifs=[];
+  amcList.forEach(a=>{
+    const st=getAmcStatus(a.expiry);
+    if(st==='expiring')notifs.push({id:`amc-exp-${a.id}`,title:'AMC Expiring Soon',desc:`${esc(a.assetName||a.assetId)} expires ${a.expiry}`,type:'warning'});
+    if(st==='expired') notifs.push({id:`amc-xpd-${a.id}`,title:'AMC Expired',desc:`${esc(a.assetName||a.assetId)} AMC has expired`,type:'danger'});
+  });
+  complaints.filter(c=>c.status==='open').forEach(c=>notifs.push({id:`cmp-${c.id}`,title:'Open Complaint',desc:esc((c.desc||'').substring(0,60)),type:'info'}));
+  tasks.filter(t=>t.status==='overdue').forEach(t=>notifs.push({id:`task-${t.id}`,title:'Overdue Task',desc:esc(t.desc),type:'danger'}));
+  const list=_q('notifList');if(!list)return;
+  const unread=notifs.filter(n=>!readNotifIds.has(n.id)).length;
+  const dot=document.querySelector('.notif-dot');if(dot)dot.style.display=unread?'':'none';
+  list.innerHTML=notifs.length?
+    `<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)">
+       <span style="font-size:13px;color:var(--text-muted)">${unread} unread</span>
+       <button onclick="markAllNotifsRead()" style="font-size:12px;color:var(--primary);background:none;border:none;cursor:pointer;font-family:var(--font-main)">Mark all read</button>
+     </div>`+
+    notifs.map(n=>`
+      <div class="notif-item ${readNotifIds.has(n.id)?'':'unread'}" onclick="markNotifRead('${n.id}',this)">
+        <div class="notif-item-title"><i class="fas fa-${n.type==='warning'?'exclamation-triangle':n.type==='danger'?'times-circle':'info-circle'}" style="color:${n.type==='warning'?'#d97706':n.type==='danger'?'#dc2626':'#0891b2'}"></i> ${n.title}</div>
+        <div class="notif-item-desc">${n.desc}</div>
+      </div>`).join(''):
+    '<div style="padding:40px;text-align:center;color:var(--text-muted)"><i class="fas fa-bell-slash" style="font-size:32px;margin-bottom:12px;display:block"></i>No notifications</div>';
+}
+function markNotifRead(id,el){readNotifIds.add(id);el.classList.remove('unread');loadNotifications();}
+function markAllNotifsRead(){document.querySelectorAll('#notifList .notif-item').forEach(el=>{const id=el.getAttribute('onclick')?.match(/markNotifRead\('([^']+)'/)?.[1];if(id)readNotifIds.add(id);el.classList.remove('unread');});loadNotifications();}
+function toggleNotifPanel(){_q('notifPanel').classList.toggle('open');loadNotifications();}
+
+// ============================================================
+// ASSET DROPDOWNS
+// ============================================================
+function populateAssetDropdowns(){['cmpAsset','amcAsset','aprAsset','taskAsset'].forEach(id=>populateAssetDropdown(id));}
+function populateAssetDropdown(selectId,selectedId=''){
+  const sel=_q(selectId);if(!sel)return;
+  if(!assets.length){sel.innerHTML='<option value="">— No assets —</option>';return;}
+  sel.innerHTML=assets.map(a=>`<option value="${esc(a.id)}" ${a.id===selectedId?'selected':''}>${esc(a.type)} — ${esc(a.tagId)}</option>`).join('');
+}
+
+// ============================================================
+// MODAL CLOSE ON OVERLAY CLICK
+// ============================================================
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open');});
+});
+
+
+</script>
+</body>
+</html>
